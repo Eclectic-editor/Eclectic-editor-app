@@ -13,6 +13,7 @@ function Home() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    window.electronAPI.loadUrl(url);
     navigate('/app', { state: { url } });
   };
 
