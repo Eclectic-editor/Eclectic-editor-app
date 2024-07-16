@@ -1,0 +1,20 @@
+.page-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  border-right: 2px solid var(--gray);
+  background: var(--black);
+}
+
+.content-editor {
+  flex: 1;
+  background: var(--deep-gray);
+  padding: 0 24px 24px;
+  box-sizing: border-box;
+
+  .editor-title + .editor-dropdown,
+  .editor-title + .editor-input-color,
+  .editor-title + .editor-input {
+    margin-top: 10px;
+  }
+}
