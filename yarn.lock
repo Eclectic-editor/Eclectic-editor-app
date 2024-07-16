@@ -5831,6 +5831,11 @@ raw-body@2.5.2:
     iconv-lite "0.4.24"
     unpipe "1.0.0"
 
+react-color-palette@^7.2.1:
+  version "7.2.1"
+  resolved "https://registry.npmjs.org/react-color-palette/-/react-color-palette-7.2.1.tgz"
+  integrity sha512-wulPqPc6qblr/bsjbW50t/je9keTRrouzPhimktCzBleNUxVJNN84cOZX5XzuS8ubQPg3h57gUT6vAKlBUDhUQ==
+
 react-dom@^18.0.0, react-dom@^18.3.1, react-dom@>=16.8:
   version "18.3.1"
   resolved "https://registry.npmjs.org/react-dom/-/react-dom-18.3.1.tgz"
