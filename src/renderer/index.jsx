@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import App from './App';
 import Home from './pages/Home';
 import Editor from './pages/Editor';
+import Modal from './components/Modal';
 
 import './styles/global.scss';
 import './styles/variables.scss';
@@ -17,6 +18,7 @@ root.render(
       <Route path="/" element={<Home />} />
       <Route path="/app" element={<App />} />
       <Route path="/editor" element={<Editor />} />
+      <Route path="/modal" element={<Modal />} />
     </Routes>
   </Router>,
 );

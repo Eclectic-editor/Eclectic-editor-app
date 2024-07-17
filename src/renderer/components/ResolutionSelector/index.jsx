@@ -56,6 +56,10 @@ function ResolutionSelector() {
     }, 300);
   };
 
+  const handleOpenModal = () => {
+    window.electronAPI.showModal();
+  };
+
   useEffect(
     () => () => {
       if (tooltipTimeoutRef.current) {
@@ -75,6 +79,7 @@ function ResolutionSelector() {
           onMouseOut={handleMouseOut}
           onFocus={(e) => handleMouseOver(e, 'Settings')}
           onBlur={handleMouseOut}
+          onClick={handleOpenModal}
         >
           <img src={iconSetting} alt="setting" />
         </button>

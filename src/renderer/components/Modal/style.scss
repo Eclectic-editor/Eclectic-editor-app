@@ -1,0 +1,51 @@
+.modal-setting {
+  display: flex;
+  flex-direction: column;
+  width: 500px;
+  height: 400px;
+  padding: 40px 20px 20px;
+  border-radius: 8px;
+  background: var(--white);
+  font-family: 'DegularDisplay', sans-serif;
+  box-sizing: border-box;
+
+  .content {
+    flex: 1;
+
+    .title {
+      font-weight: 700;
+      font-size: 2.8rem;
+      padding-bottom: 30px;
+    }
+
+    .box-setting {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    .label-setting {
+      font-size: 2rem;
+    }
+
+    .input-setting {
+      width: 300px;
+      height: 40px;
+      padding: 10px;
+      font-size: 1.6rem;
+      box-sizing: border-box;
+    }
+  }
+
+  .button-close {
+    width: 100%;
+    height: 50px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: var(--black);
+    font-size: 1.6rem;
+    color: var(--white);
+    cursor: pointer;
+  }
+}

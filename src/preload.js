@@ -6,4 +6,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   showTooltip: ({ x, y, text }) =>
     ipcRenderer.send('show-tooltip', { x, y, text }),
   hideTooltip: () => ipcRenderer.send('hide-tooltip'),
+  showModal: () => ipcRenderer.send('show-modal'),
+  closeModal: () => ipcRenderer.send('close-modal'),
 });
