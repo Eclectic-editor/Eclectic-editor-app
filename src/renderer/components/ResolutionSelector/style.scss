@@ -7,6 +7,34 @@
   border-bottom: 2px solid var(--gray);
   background-color: var(--dark-gray);
   box-sizing: border-box;
+
+  .tooltip-container {
+    display: inline-block;
+    position: relative;
+
+    &:hover {
+      .tooltip {
+        visibility: visible;
+      }
+    }
+  }
+
+  .tooltip {
+    position: absolute;
+    z-index: 1;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px;
+    border-radius: 3px;
+    background: var(--black);
+    font-size: 1.4rem;
+    font-family: 'DegularDisplay', sans-serif;
+    color: var(--white);
+    text-align: center;
+    visibility: hidden;
+    white-space: nowrap;
+  }
 }
 
 .resolution-selector {
