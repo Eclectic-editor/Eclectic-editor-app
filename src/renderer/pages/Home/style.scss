@@ -10,6 +10,10 @@
   background-size: cover;
   box-sizing: border-box;
 
+  &.is-hide {
+    display: none;
+  }
+
   [class^='area-'] {
     border-radius: 24px;
     background: var(--white);

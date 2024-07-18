@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import IntroArea from './IntroArea';
 import LogoArea from './LogoArea';
@@ -9,16 +8,16 @@ import './style.scss';
 
 function Home() {
   const [url, setUrl] = useState('');
-  const navigate = useNavigate();
+  const [isHidden, setIsHidden] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     window.electronAPI.loadUrl(url);
-    navigate('/app', { state: { url } });
+    setIsHidden(true);
   };
 
   return (
-    <section className="page-intro">
+    <section className={`page-intro ${isHidden ? 'is-hide' : ''}`}>
       <IntroArea />
       <LogoArea />
       <InputArea url={url} setUrl={setUrl} handleSubmit={handleSubmit} />
