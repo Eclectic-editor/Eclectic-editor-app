@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import EditorButton from '../../components/EditorButton';
 import EditorSection from '../../components/EditorSection';
@@ -7,53 +7,94 @@ import EditorDropdown from '../../components/EditorDropdown';
 import EditorColorInput from '../../components/EditorColorInput';
 import EditorUnitInput from '../../components/EditorUnitInput';
 
+import {
+  FONT_FAMILY_ITEMS,
+  FONT_WEIGHT_ITEMS,
+  FONT_STYLE_ITEMS,
+  FONT_VARIANT_ITEMS,
+  TEXT_DECORATION_ITEMS,
+} from '../../constants/fonts';
+import {
+  cleanFontFamily,
+  toFixedTwo,
+  camelToKebabCase,
+} from '../../utils/styleUtils';
+
 import './style.scss';
 
-function FontArea({ onBack }) {
+function FontArea({ onBack, selectedElement }) {
   const [fontFamily, setFontFamily] = useState('Arial');
-  const [color, setColor] = useState({ r: 255, g: 255, b: 255, a: 1 });
+  const [color, setColor] = useState('rgb(255, 255, 255)');
   const [fontSize, setFontSize] = useState('17px');
   const [lineHeight, setLineHeight] = useState('24px');
+  const [fontWeight, setFontWeight] = useState('normal');
   const [fontStyle, setFontStyle] = useState('normal');
   const [fontVariant, setFontVariant] = useState('normal');
   const [textDecoration, setTextDecoration] = useState('none');
 
-  const fontFamilyItems = [
-    'Arial',
-    'Verdana',
-    'Times New Roman',
-    'Noto Sans KR',
-  ];
-  const fontStyleItems = ['normal', 'italic', 'oblique'];
-  const fontVariantItems = ['normal', 'small-caps'];
-  const textDecorationItems = ['none', 'underline', 'overline', 'line-through'];
+  useEffect(() => {
+    if (selectedElement) {
+      const {
+        fontFamily: selectedFontFamily,
+        color: selectedColor,
+        fontSize: selectedFontSize,
+        lineHeight: selectedLineHeight,
+        fontWeight: selectedFontWeight,
+        fontStyle: selectedFontStyle,
+        fontVariant: selectedFontVariant,
+        textDecorationLine: selectedTextDecoration,
+      } = selectedElement.style;
 
-  const handleFontSelect = (selectedFont) => {
-    setFontFamily(selectedFont);
+      setFontFamily(cleanFontFamily(selectedFontFamily) || 'Arial');
+      setColor(selectedColor || 'rgb(255, 255, 255)');
+      setFontSize(toFixedTwo(selectedFontSize) || '17px');
+      setLineHeight(toFixedTwo(selectedLineHeight) || '24px');
+      setFontWeight(selectedFontWeight || 'normal');
+      setFontStyle(selectedFontStyle || 'normal');
+      setFontVariant(selectedFontVariant || 'normal');
+      setTextDecoration(selectedTextDecoration || 'none');
+    }
+  }, [selectedElement]);
+
+  const applyStyle = (css) => {
+    if (selectedElement) {
+      window.electronAPI.applyStyle({
+        eclectic: selectedElement.eclectic,
+        cssText: css,
+      });
+    }
   };
 
-  const handleColorChange = (newColor) => {
-    setColor(newColor);
-  };
-
-  const handleFontSizeChange = (newSize) => {
-    setFontSize(newSize);
-  };
-
-  const handleLineHeightChange = (newHeight) => {
-    setLineHeight(newHeight);
-  };
-
-  const handleFontStyleChange = (selectedStyle) => {
-    setFontStyle(selectedStyle);
-  };
-
-  const handleFontVariantChange = (selectedVariant) => {
-    setFontVariant(selectedVariant);
-  };
-
-  const handleTextDecorationChange = (selectedDecoration) => {
-    setTextDecoration(selectedDecoration);
+  const handleStyleChange = (property, value) => {
+    switch (property) {
+      case 'fontFamily':
+        setFontFamily(value);
+        break;
+      case 'color':
+        setColor(value);
+        break;
+      case 'fontSize':
+        setFontSize(value);
+        break;
+      case 'lineHeight':
+        setLineHeight(value);
+        break;
+      case 'fontWeight':
+        setFontWeight(value);
+        break;
+      case 'fontStyle':
+        setFontStyle(value);
+        break;
+      case 'fontVariant':
+        setFontVariant(value);
+        break;
+      case 'textDecoration':
+        setTextDecoration(value);
+        break;
+      default:
+        break;
+    }
+    applyStyle(`${camelToKebabCase(property)}: ${value}`);
   };
 
   return (
@@ -64,8 +105,8 @@ function FontArea({ onBack }) {
           <EditorTitle title="Font Family" />
           <EditorDropdown
             defaultText={fontFamily}
-            items={fontFamilyItems}
-            onSelect={handleFontSelect}
+            items={FONT_FAMILY_ITEMS}
+            onSelect={(value) => handleStyleChange('fontFamily', value)}
           />
         </EditorSection>
         <EditorSection>
@@ -74,7 +115,7 @@ function FontArea({ onBack }) {
             id="font-color"
             label="Color"
             value={color}
-            onChange={handleColorChange}
+            onChange={(value) => handleStyleChange('color', value)}
           />
         </EditorSection>
         <EditorSection>
@@ -84,7 +125,7 @@ function FontArea({ onBack }) {
             label="Font Size (px)"
             unit="px"
             value={fontSize}
-            onChange={handleFontSizeChange}
+            onChange={(value) => handleStyleChange('fontSize', value)}
           />
         </EditorSection>
         <EditorSection>
@@ -94,31 +135,39 @@ function FontArea({ onBack }) {
             label="Line Height (px)"
             unit="px"
             value={lineHeight}
-            onChange={handleLineHeightChange}
+            onChange={(value) => handleStyleChange('lineHeight', value)}
+          />
+        </EditorSection>
+        <EditorSection>
+          <EditorTitle title="Font Weight" />
+          <EditorDropdown
+            defaultText={fontWeight}
+            items={FONT_WEIGHT_ITEMS}
+            onSelect={(value) => handleStyleChange('fontWeight', value)}
           />
         </EditorSection>
         <EditorSection>
           <EditorTitle title="Font Style" />
           <EditorDropdown
             defaultText={fontStyle}
-            items={fontStyleItems}
-            onSelect={handleFontStyleChange}
+            items={FONT_STYLE_ITEMS}
+            onSelect={(value) => handleStyleChange('fontStyle', value)}
           />
         </EditorSection>
         <EditorSection>
           <EditorTitle title="Font Variant" />
           <EditorDropdown
             defaultText={fontVariant}
-            items={fontVariantItems}
-            onSelect={handleFontVariantChange}
+            items={FONT_VARIANT_ITEMS}
+            onSelect={(value) => handleStyleChange('fontVariant', value)}
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title={textDecoration} />
+          <EditorTitle title="Text Decoration" />
           <EditorDropdown
-            defaultText="Select Text Decoration"
-            items={textDecorationItems}
-            onSelect={handleTextDecorationChange}
+            defaultText={textDecoration}
+            items={TEXT_DECORATION_ITEMS}
+            onSelect={(value) => handleStyleChange('textDecoration', value)}
           />
         </EditorSection>
       </article>

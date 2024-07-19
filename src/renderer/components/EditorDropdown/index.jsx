@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 
 import './style.scss';
 
@@ -8,6 +8,10 @@ function EditorDropdown({ defaultText, items, onSelect }) {
   const [dropdownPosition, setDropdownPosition] = useState({});
   const buttonRef = useRef(null);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    setSelectedItem(defaultText);
+  }, [defaultText]);
 
   const handleButtonClick = () => {
     setIsOpen(!isOpen);

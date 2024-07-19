@@ -1,0 +1,105 @@
+const style = document.createElement('style');
+
+style.innerHTML = `
+.hover-highlight {
+  outline-offset: -1px;
+  outline: 1px dashed #00b894;
+  z-index: 1000;
+}
+.click-highlight {
+  outline-offset: -1px;
+  outline: 1px solid #0984e3;
+  z-index: 1000;
+}
+.hover-element-info,
+.click-element-info {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2px 5px;
+  font-size: 14px;
+  z-index: 1000;
+  pointer-events: none;
+}
+`;
+document.head.appendChild(style);
+
+const hoverInfoBox = document.createElement('div');
+hoverInfoBox.classList.add('hover-element-info');
+document.body.appendChild(hoverInfoBox);
+
+const clickInfoBox = document.createElement('div');
+clickInfoBox.classList.add('click-element-info');
+document.body.appendChild(clickInfoBox);
+
+const updateInfoBoxPosition = (event, infoBoxParam) => {
+  const infoBox = infoBoxParam;
+  const rect = event.target.getBoundingClientRect();
+  infoBox.style.top = `${rect.top + window.scrollY - infoBox.offsetHeight}px`;
+  infoBox.style.left = `${rect.left + window.scrollX}px`;
+  infoBox.style.backgroundColor =
+    event.type === 'mouseover' ? '#00b894' : '#0984e3';
+  infoBox.innerHTML = `<strong>${event.target.tagName.toLowerCase()}</strong>${
+    event.target.classList.length > 0
+      ? `.${Array.from(event.target.classList)
+          .filter((c) => c !== 'hover-highlight' && c !== 'click-highlight')
+          .join('.')}`
+      : ''
+  }`;
+};
+
+const addEventListeners = (target) => {
+  target.addEventListener('mouseover', (event) => {
+    if (window.hoveredElement) {
+      window.hoveredElement.classList.remove('hover-highlight');
+    }
+    if (event.target.classList.contains('click-highlight')) return;
+
+    event.target.classList.add('hover-highlight');
+    window.hoveredElement = event.target;
+
+    updateInfoBoxPosition(event, hoverInfoBox);
+  });
+
+  target.addEventListener('click', async (eventParam) => {
+    const event = eventParam;
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (window.selectedElement) {
+      window.selectedElement.classList.remove('click-highlight');
+    }
+    event.target.classList.add('click-highlight');
+    window.selectedElement = event.target;
+
+    if (!event.target.dataset.eclectic) {
+      event.target.dataset.eclectic = await window.electronAPI.generateUUID();
+    }
+
+    const elementInfo = {
+      eclectic: event.target.dataset.eclectic,
+    };
+    window.electronAPI.elementClicked(elementInfo);
+
+    updateInfoBoxPosition(event, clickInfoBox);
+  });
+};
+
+const observer = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    mutation.addedNodes.forEach((node) => {
+      if (node.nodeType === 1) {
+        addEventListeners(node);
+        node.querySelectorAll('*').forEach(addEventListeners);
+      }
+    });
+  });
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true,
+});
+
+document.querySelectorAll('*').forEach(addEventListeners);

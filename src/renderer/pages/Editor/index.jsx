@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import EditorButton from '../../components/EditorButton';
 import FontArea from './FontArea';
@@ -14,13 +14,31 @@ import './style.scss';
 
 function Editor() {
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedElement, setSelectedElement] = useState(null);
+
+  useEffect(() => {
+    const handleElementClicked = (elementInfo) => {
+      setSelectedElement(elementInfo);
+    };
+
+    window.electronAPI.receive('element-style', handleElementClicked);
+
+    return () => {
+      window.electronAPI.removeListener('element-style', handleElementClicked);
+    };
+  }, []);
 
   const handleCategoryClick = (id) => {
     setSelectedCategory(id);
   };
 
   const editorComponents = {
-    font: <FontArea onBack={() => setSelectedCategory(null)} />,
+    font: (
+      <FontArea
+        selectedElement={selectedElement}
+        onBack={() => setSelectedCategory(null)}
+      />
+    ),
     text: <TextArea onBack={() => setSelectedCategory(null)} />,
     background: <BackgroundArea onBack={() => setSelectedCategory(null)} />,
     dimensions: <DimensionsArea onBack={() => setSelectedCategory(null)} />,

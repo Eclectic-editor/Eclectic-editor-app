@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { ColorPicker, useColor } from 'react-color-palette';
 
+import { convertColorFormat } from '../../utils/styleUtils';
+
 import 'react-color-palette/dist/css/rcp.css';
 import './style.scss';
 
 function EditorColorInput({ id, label, value, onChange }) {
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
-  const [color, setColor] = useColor('rgba', value);
-  const [tempColor, setTempColor] = useState(color);
+  const [color, setColor] = useColor(convertColorFormat(value));
 
   const handleClick = () => {
-    setTempColor(color);
     setDisplayColorPicker(true);
   };
 
@@ -19,21 +19,17 @@ function EditorColorInput({ id, label, value, onChange }) {
   };
 
   const handleSubmit = () => {
-    setColor(tempColor);
-    onChange(tempColor);
+    const rgba = color.rgb;
+    let formattedColor;
+
+    if (rgba.a === 1) {
+      formattedColor = `rgb(${Math.trunc(rgba.r)}, ${Math.trunc(rgba.g)}, ${Math.trunc(rgba.b)})`;
+    } else {
+      formattedColor = `rgba(${Math.trunc(rgba.r)}, ${Math.trunc(rgba.g)}, ${Math.trunc(rgba.b)}, ${Math.trunc(rgba.a)})`;
+    }
+
+    onChange(formattedColor);
     setDisplayColorPicker(false);
-  };
-
-  const handleChange = (newColor) => {
-    setTempColor(newColor);
-  };
-
-  const formatRgba = (rgba) => {
-    const r = Math.round(rgba.r);
-    const g = Math.round(rgba.g);
-    const b = Math.round(rgba.b);
-    const a = rgba.a === 1 ? '1' : rgba.a.toFixed(1);
-    return `rgba(${r}, ${g}, ${b}, ${a})`;
   };
 
   return (
@@ -44,7 +40,7 @@ function EditorColorInput({ id, label, value, onChange }) {
       <div className="color-input-wrapper">
         <input
           type="text"
-          value={formatRgba(color.rgb)}
+          value={value}
           id={id}
           className="box-input"
           readOnly
@@ -52,15 +48,15 @@ function EditorColorInput({ id, label, value, onChange }) {
         />
         <div
           className="color-swatch"
-          style={{ backgroundColor: formatRgba(color.rgb) }}
+          style={{ backgroundColor: value }}
           onClick={handleClick}
         />
         {displayColorPicker && (
           <div className="popup-color">
             <ColorPicker
               height={150}
-              color={tempColor}
-              onChange={handleChange}
+              color={color}
+              onChange={setColor}
               hideInput={['hsv']}
             />
             <div className="popup-color-button">

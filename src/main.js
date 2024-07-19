@@ -1,5 +1,7 @@
 const { app, BrowserWindow, BrowserView, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
+const { randomUUID } = require('crypto');
 
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -167,14 +169,14 @@ const createBrowserViews = async (url) => {
 
   const editorUrl = process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL
     ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}/editor`
-    : `file://${path.join(__dirname, '../dist/renderer/index.html')}#/editor`;
+    : `file://${path.join(__dirname, '../dist/renderer/index.html')}/editor`;
 
   mainWindow.addBrowserView(resolutionView);
 
   resolutionView.setBounds({
     x: 0,
     y: 0,
-    width: 1400,
+    width: mainWindow.getBounds().width,
     height: 80,
   });
 
@@ -207,100 +209,11 @@ const createBrowserViews = async (url) => {
 
     webPageView.webContents.on('did-finish-load', async () => {
       try {
-        await webPageView.webContents.executeJavaScript(`
-          const style = document.createElement('style');
-          style.innerHTML = \`
-          .hover-highlight {
-            position: relative;
-            outline: 2px dashed #00b894;
-            z-index: 1000;
-          }
-          .click-highlight {
-            outline: 2px solid #0984e3;
-            z-index: 1000;
-          }
-          .hover-element-info,
-          .click-element-info {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 2px 5px;
-            font-size: 14px;
-            z-index: 1000;
-            pointer-events: none;
-          }
-          \`;
-          document.head.appendChild(style);
-
-          const hoverInfoBox = document.createElement('div');
-          hoverInfoBox.classList.add('hover-element-info');
-          document.body.appendChild(hoverInfoBox);
-
-          const clickInfoBox = document.createElement('div');
-          clickInfoBox.classList.add('click-element-info');
-          document.body.appendChild(clickInfoBox);
-
-          const addEventListeners = (target) => {
-            target.addEventListener('mouseover', (event) => {
-              if (window.hoveredElement) {
-                window.hoveredElement.classList.remove('hover-highlight');
-              }
-              if (event.target.classList.contains('click-highlight')) return;
-
-              event.target.classList.add('hover-highlight');
-              window.hoveredElement = event.target;
-
-              const rect = event.target.getBoundingClientRect();
-              hoverInfoBox.style.top = rect.top + window.scrollY - hoverInfoBox.offsetHeight + 'px';
-              hoverInfoBox.style.left = rect.left + window.scrollX + 'px';
-              hoverInfoBox.style.backgroundColor = '#00b894';
-              hoverInfoBox.innerHTML = \`<strong>\${event.target.tagName.toLowerCase()}</strong>\${
-                event.target.classList.length > 0
-                  ? '.' + Array.from(event.target.classList).filter(c => c !== 'hover-highlight' && c !== 'click-highlight').join('.')
-                  : ''
-              }\`;
-            });
-
-            target.addEventListener('click', (event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              if (window.selectedElement) {
-                window.selectedElement.classList.remove('click-highlight');
-              }
-              event.target.classList.add('click-highlight');
-              window.selectedElement = event.target;
-
-              const rect = event.target.getBoundingClientRect();
-              clickInfoBox.style.top = rect.top + window.scrollY - clickInfoBox.offsetHeight + 'px';
-              clickInfoBox.style.left = rect.left + window.scrollX + 'px';
-              clickInfoBox.style.backgroundColor = '#0984e3';
-              clickInfoBox.innerHTML = \`<strong>\${event.target.tagName.toLowerCase()}</strong>\${
-                event.target.classList.length > 0
-                  ? '.' + Array.from(event.target.classList).filter(c => c !== 'hover-highlight' && c !== 'click-highlight').join('.')
-                  : ''
-              }\`;
-            });
-          };
-
-          const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-              mutation.addedNodes.forEach((node) => {
-                if (node.nodeType === 1) { // Element Node
-                  addEventListeners(node);
-                  node.querySelectorAll('*').forEach(addEventListeners);
-                }
-              });
-            });
-          });
-
-          observer.observe(document.body, {
-            childList: true,
-            subtree: true
-          });
-
-          document.querySelectorAll('*').forEach(addEventListeners);
-        `);
+        const script = fs.readFileSync(
+          path.join(__dirname, 'highlight.js'),
+          'utf8',
+        );
+        await webPageView.webContents.executeJavaScript(script);
         removeLoadingView();
       } catch (err) {
         console.error('Error during JavaScript execution:', err);
@@ -321,6 +234,7 @@ const createWindow = () => {
       enableRemoteModule: false,
       sandbox: false,
     },
+    fullscreen: true,
   });
 
   const startUrl =
@@ -337,7 +251,6 @@ const createWindow = () => {
   });
 
   ipcMain.on('show-modal', () => {
-    console.log('show-modal event received');
     if (modalView) {
       mainWindow.removeBrowserView(modalView);
       mainWindow.removeBrowserView(shadowView);
@@ -348,12 +261,55 @@ const createWindow = () => {
   });
 
   ipcMain.on('close-modal', () => {
-    console.log('close-modal event received');
     if (modalView) {
       mainWindow.removeBrowserView(modalView);
       mainWindow.removeBrowserView(shadowView);
       modalView = null;
       shadowView = null;
+    }
+  });
+
+  ipcMain.on('apply-style', (event, style) => {
+    webPageView.webContents
+      .executeJavaScript(
+        `
+      (function() {
+        const selectedElement = document.querySelector('[data-eclectic="${style.eclectic}"]');
+        if (selectedElement) {
+          selectedElement.style.cssText += '${style.cssText}';
+        }
+      })();
+    `,
+      )
+      .catch((err) => console.error(err));
+  });
+
+  ipcMain.on('element-clicked', async (event, elementInfo) => {
+    const style = await webPageView.webContents.executeJavaScript(`
+      (function() {
+        const element = document.querySelector('[data-eclectic="${elementInfo.eclectic}"]');
+        if (element) {
+          const computedStyle = window.getComputedStyle(element);
+          return {
+            fontFamily: computedStyle.fontFamily,
+            color: computedStyle.color,
+            fontSize: computedStyle.fontSize,
+            lineHeight: computedStyle.lineHeight,
+            fontWeight: computedStyle.fontWeight,
+            fontStyle: computedStyle.fontStyle,
+            fontVariant: computedStyle.fontVariant,
+            textDecoration: computedStyle.textDecoration,
+          };
+        }
+        return null;
+      })();
+    `);
+
+    if (style) {
+      editorView.webContents.send('element-style', {
+        eclectic: elementInfo.eclectic,
+        style,
+      });
     }
   });
 };
@@ -373,3 +329,5 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
+
+ipcMain.handle('generate-uuid', async () => randomUUID());
