@@ -11,14 +11,17 @@ import './style.scss';
 
 function ResolutionSelector() {
   const resolutions = [
-    { label: 'Mobile', icon: iconMobile },
-    { label: 'Tablet', icon: iconTablet },
-    { label: 'Desktop', icon: iconDesktop },
-    { label: 'Responsive', icon: iconResponsive },
+    { label: 'Mobile', icon: iconMobile, width: 375, height: 667 },
+    { label: 'Tablet', icon: iconTablet, width: 768, height: 1024 },
+    { label: 'Desktop', icon: iconDesktop, width: 1440, height: 900 },
   ];
 
   const openModal = () => {
     window.electronAPI.showModal();
+  };
+
+  const openResponsiveViews = () => {
+    window.electronAPI.openResponsiveViews();
   };
 
   return (
@@ -50,6 +53,16 @@ function ResolutionSelector() {
             <div className="tooltip">{res.label}</div>
           </div>
         ))}
+        <div className="tooltip-container">
+          <button
+            type="button"
+            className="resolution-button"
+            onClick={openResponsiveViews}
+          >
+            <img src={iconResponsive} alt="Responsive" />
+          </button>
+          <div className="tooltip">Responsive</div>
+        </div>
       </div>
     </div>
   );

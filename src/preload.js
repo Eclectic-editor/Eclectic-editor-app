@@ -8,7 +8,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   elementClicked: (elementInfo) =>
     ipcRenderer.send('element-clicked', elementInfo),
   applyStyle: (style) => ipcRenderer.send('apply-style', style),
-  generateUUID: () => ipcRenderer.invoke('generate-uuid'),
+  openResponsiveViews: () => ipcRenderer.send('openResponsiveViews'),
   receive: (channel, func) => {
     ipcRenderer.on(channel, (event, ...args) => func(...args));
   },

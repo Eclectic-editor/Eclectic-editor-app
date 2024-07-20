@@ -33,6 +33,32 @@ const clickInfoBox = document.createElement('div');
 clickInfoBox.classList.add('click-element-info');
 document.body.appendChild(clickInfoBox);
 
+function getXPath(element) {
+  if (element.id !== '') {
+    return `//*[@id='${element.id}']`;
+  }
+
+  if (element === document.body) {
+    return '/html/body';
+  }
+
+  let ix = 0;
+  const siblings = element.parentNode.childNodes;
+
+  for (let i = 0; i < siblings.length; i += 1) {
+    const sibling = siblings[i];
+    if (sibling === element) {
+      const tagName = element.tagName.toLowerCase();
+      return `${getXPath(element.parentNode)}/${tagName}[${ix + 1}]`;
+    }
+    if (sibling.nodeType === 1 && sibling.tagName === element.tagName) {
+      ix += 1;
+    }
+  }
+
+  return null;
+}
+
 const updateInfoBoxPosition = (event, infoBoxParam) => {
   const infoBox = infoBoxParam;
   const rect = event.target.getBoundingClientRect();
@@ -73,12 +99,10 @@ const addEventListeners = (target) => {
     event.target.classList.add('click-highlight');
     window.selectedElement = event.target;
 
-    if (!event.target.dataset.eclectic) {
-      event.target.dataset.eclectic = await window.electronAPI.generateUUID();
-    }
+    const xPath = getXPath(event.target);
 
     const elementInfo = {
-      eclectic: event.target.dataset.eclectic,
+      xPath,
     };
     window.electronAPI.elementClicked(elementInfo);
 

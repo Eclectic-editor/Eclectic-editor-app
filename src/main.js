@@ -1,7 +1,6 @@
 const { app, BrowserWindow, BrowserView, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const { randomUUID } = require('crypto');
 
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -14,6 +13,8 @@ let resolutionView;
 let loadingView;
 let modalView;
 let shadowView;
+let responsiveViews = [];
+const editedStyles = {};
 
 const createModalView = () => {
   if (modalView) {
@@ -224,6 +225,65 @@ const createBrowserViews = async (url) => {
   }
 };
 
+const applyStyles = async (view, editedStyle) => {
+  const promises = Object.values(editedStyle).map(async ({ xPath, style }) => {
+    const styleString = Object.entries(style)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join('; ');
+    await view.webContents.executeJavaScript(`
+      (function() {
+        const selectedElement = document.evaluate(${JSON.stringify(xPath)}, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        if (selectedElement) {
+          selectedElement.style.cssText += '${styleString}';
+        }
+      })();
+    `);
+  });
+  await Promise.all(promises);
+};
+
+const createResponsiveViews = async () => {
+  if (responsiveViews.length > 0) {
+    responsiveViews.forEach((view) => mainWindow.removeBrowserView(view));
+    responsiveViews = [];
+  }
+
+  const viewConfigs = [
+    { width: 375, height: mainWindow.getBounds().height - 80, x: 0 },
+    { width: 768, height: mainWindow.getBounds().height - 80, x: 375 },
+    { width: 1440, height: mainWindow.getBounds().height - 80, x: 1143 },
+  ];
+
+  const currentUrl = await webPageView.webContents.getURL();
+
+  const viewPromises = viewConfigs.map(async (config) => {
+    const view = new BrowserView({
+      webPreferences: {
+        preload: path.join(__dirname, 'preload.js'),
+        contextIsolation: true,
+        enableRemoteModule: false,
+      },
+    });
+
+    mainWindow.addBrowserView(view);
+    view.setBounds({
+      x: config.x,
+      y: 80,
+      width: config.width,
+      height: config.height,
+    });
+    view.setAutoResize({ width: false, height: false });
+    await view.webContents.loadURL(currentUrl);
+    await applyStyles(view, editedStyles);
+
+    responsiveViews.push(view);
+  });
+
+  await Promise.all(viewPromises);
+
+  mainWindow.removeBrowserView(editorView);
+};
+
 const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1400,
@@ -250,6 +310,10 @@ const createWindow = () => {
     await createBrowserViews(url);
   });
 
+  ipcMain.on('openResponsiveViews', async () => {
+    await createResponsiveViews();
+  });
+
   ipcMain.on('show-modal', () => {
     if (modalView) {
       mainWindow.removeBrowserView(modalView);
@@ -270,14 +334,22 @@ const createWindow = () => {
   });
 
   ipcMain.on('apply-style', (event, style) => {
+    const { xPath, cssText } = style;
+
+    if (!editedStyles[xPath]) {
+      editedStyles[xPath] = { style: {} };
+    }
+    const [property, value] = cssText.split(': ');
+    editedStyles[xPath].style[property] = value;
+
     webPageView.webContents
       .executeJavaScript(
         `
       (function() {
-        const selectedElement = document.querySelector('[data-eclectic="${style.eclectic}"]');
-        if (selectedElement) {
-          selectedElement.style.cssText += '${style.cssText}';
-        }
+        const selectedElement = document.evaluate(${JSON.stringify(xPath)}, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+          if (selectedElement) {
+            selectedElement.style.cssText += '${cssText}';
+          }
       })();
     `,
       )
@@ -287,18 +359,39 @@ const createWindow = () => {
   ipcMain.on('element-clicked', async (event, elementInfo) => {
     const style = await webPageView.webContents.executeJavaScript(`
       (function() {
-        const element = document.querySelector('[data-eclectic="${elementInfo.eclectic}"]');
+        function getElementXPath(element) {
+          if (element.id !== '')
+            return 'id("' + element.id + '")';
+          if (element === document.body)
+            return element.tagName;
+
+          let ix = 0;
+          const siblings = element.parentNode.childNodes;
+          for (let i = 0; i < siblings.length; i++) {
+            const sibling = siblings[i];
+            if (sibling === element)
+              return getElementXPath(element.parentNode) + '/' + element.tagName + '[' + (ix + 1) + ']';
+            if (sibling.nodeType === 1 && sibling.tagName === element.tagName)
+              ix++;
+          }
+          return null;
+        }
+
+        const element = document.evaluate(${JSON.stringify(elementInfo.xPath)}, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         if (element) {
           const computedStyle = window.getComputedStyle(element);
           return {
-            fontFamily: computedStyle.fontFamily,
-            color: computedStyle.color,
-            fontSize: computedStyle.fontSize,
-            lineHeight: computedStyle.lineHeight,
-            fontWeight: computedStyle.fontWeight,
-            fontStyle: computedStyle.fontStyle,
-            fontVariant: computedStyle.fontVariant,
-            textDecoration: computedStyle.textDecoration,
+            xPath: ${JSON.stringify(elementInfo.xPath)},
+            style: {
+              fontFamily: computedStyle.fontFamily,
+              color: computedStyle.color,
+              fontSize: computedStyle.fontSize,
+              lineHeight: computedStyle.lineHeight,
+              fontWeight: computedStyle.fontWeight,
+              fontStyle: computedStyle.fontStyle,
+              fontVariant: computedStyle.fontVariant,
+              textDecoration: computedStyle.textDecoration,
+            }
           };
         }
         return null;
@@ -306,10 +399,8 @@ const createWindow = () => {
     `);
 
     if (style) {
-      editorView.webContents.send('element-style', {
-        eclectic: elementInfo.eclectic,
-        style,
-      });
+      editedStyles[elementInfo.xPath] = style;
+      editorView.webContents.send('element-style', style);
     }
   });
 };
@@ -329,5 +420,3 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
-
-ipcMain.handle('generate-uuid', async () => randomUUID());

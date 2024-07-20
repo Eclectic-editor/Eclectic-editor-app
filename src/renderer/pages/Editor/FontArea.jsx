@@ -59,7 +59,7 @@ function FontArea({ onBack, selectedElement }) {
   const applyStyle = (css) => {
     if (selectedElement) {
       window.electronAPI.applyStyle({
-        eclectic: selectedElement.eclectic,
+        xPath: selectedElement.xPath,
         cssText: css,
       });
     }
