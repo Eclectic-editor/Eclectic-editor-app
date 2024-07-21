@@ -9,12 +9,16 @@ if (require('electron-squirrel-startup')) {
 let mainWindow;
 let editorView;
 let webPageView;
+let backgroundView;
 let resolutionView;
 let loadingView;
 let modalView;
 let shadowView;
 let responsiveViews = [];
 const editedStyles = {};
+let isSyncing = false;
+let lastScrollSource = -1;
+let debounceTimer;
 
 const createModalView = () => {
   if (modalView) {
@@ -242,21 +246,57 @@ const applyStyles = async (view, editedStyle) => {
   await Promise.all(promises);
 };
 
+const createBackgroundView = () => {
+  backgroundView = new BrowserView({
+    webPreferences: {
+      contextIsolation: true,
+      enableRemoteModule: false,
+    },
+  });
+
+  mainWindow.addBrowserView(backgroundView);
+
+  backgroundView.setBounds({
+    x: 0,
+    y: 80,
+    width: mainWindow.getBounds().width,
+    height: mainWindow.getBounds().height - 80,
+  });
+
+  const backgroundHtml = `
+    <style>
+      body {
+        background-color: #303030;
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+    <div></div>
+  `;
+
+  backgroundView.webContents.loadURL(
+    `data:text/html;charset=utf-8,${encodeURIComponent(backgroundHtml)}`,
+  );
+};
+
 const createResponsiveViews = async () => {
   if (responsiveViews.length > 0) {
-    responsiveViews.forEach((view) => mainWindow.removeBrowserView(view));
+    responsiveViews.forEach((view) => {
+      mainWindow.removeBrowserView(view);
+      view.webContents.destroy();
+    });
     responsiveViews = [];
   }
 
   const viewConfigs = [
-    { width: 375, height: mainWindow.getBounds().height - 80, x: 0 },
-    { width: 768, height: mainWindow.getBounds().height - 80, x: 375 },
-    { width: 1440, height: mainWindow.getBounds().height - 80, x: 1143 },
+    { width: 375, height: 812, scale: 0.5, x: 20 },
+    { width: 768, height: 1024, scale: 0.5, x: 375 * 0.5 + 40 },
+    { width: 1440, height: 900, scale: 0.5, x: 375 * 0.5 + 768 * 0.5 + 60 },
   ];
 
   const currentUrl = await webPageView.webContents.getURL();
 
-  const viewPromises = viewConfigs.map(async (config) => {
+  const viewPromises = viewConfigs.map(async (config, index) => {
     const view = new BrowserView({
       webPreferences: {
         preload: path.join(__dirname, 'preload.js'),
@@ -266,14 +306,41 @@ const createResponsiveViews = async () => {
     });
 
     mainWindow.addBrowserView(view);
+
+    const scaledWidth = config.width * config.scale;
+
+    let heightOffset;
+    switch (index) {
+      case 0:
+        heightOffset = 487;
+        break;
+      case 1:
+        heightOffset = 605;
+        break;
+      case 2:
+        heightOffset = 570;
+        break;
+      default:
+        heightOffset = 570;
+    }
+
     view.setBounds({
       x: config.x,
-      y: 80,
-      width: config.width,
-      height: config.height,
+      y: 120,
+      width: scaledWidth,
+      height: heightOffset,
     });
-    view.setAutoResize({ width: false, height: false });
+
     await view.webContents.loadURL(currentUrl);
+
+    const scrollManagerPath = path.join(__dirname, 'ScrollManager.js');
+    const scrollManagerScript = fs.readFileSync(scrollManagerPath, 'utf8');
+    await view.webContents.executeJavaScript(`
+      const viewIndex = ${index};
+      ${scrollManagerScript}
+      const scrollManager = new ScrollManager(viewIndex);
+    `);
+
     await applyStyles(view, editedStyles);
 
     responsiveViews.push(view);
@@ -281,8 +348,67 @@ const createResponsiveViews = async () => {
 
   await Promise.all(viewPromises);
 
-  mainWindow.removeBrowserView(editorView);
+  if (editorView) {
+    mainWindow.removeBrowserView(editorView);
+  }
+
+  if (webPageView) {
+    mainWindow.removeBrowserView(webPageView);
+  }
 };
+
+const debounceSync =
+  (func, delay) =>
+  (...args) => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => func(...args), delay);
+  };
+
+ipcMain.on(
+  'syncScroll',
+  debounceSync((event, sourceIndex, scrollPercentage) => {
+    if (isSyncing || sourceIndex === lastScrollSource) return;
+    isSyncing = true;
+
+    lastScrollSource = sourceIndex;
+
+    responsiveViews.forEach((view, index) => {
+      if (index !== sourceIndex) {
+        view.webContents.executeJavaScript(
+          `
+        (function() {
+          window.removeEventListener('scroll', scrollManager.handleScroll);
+          const scrollX = ${scrollPercentage.x} * (document.documentElement.scrollWidth - window.innerWidth);
+          const scrollY = ${scrollPercentage.y} * (document.documentElement.scrollHeight - window.innerHeight);
+          window.scrollTo(scrollX || 0, scrollY || 0);
+          setTimeout(() => {
+            window.addEventListener('scroll', scrollManager.handleScroll);
+          }, 100);
+        })();`,
+        );
+      }
+    });
+
+    setTimeout(() => {
+      isSyncing = false;
+      lastScrollSource = -1;
+    }, 100);
+  }, 150),
+);
+
+ipcMain.on('openResponsiveViews', async () => {
+  responsiveViews.forEach((view) => {
+    mainWindow.removeBrowserView(view);
+    view.webContents.destroy();
+  });
+  responsiveViews = [];
+
+  if (!backgroundView) {
+    createBackgroundView();
+  }
+
+  await createResponsiveViews();
+});
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
@@ -308,10 +434,6 @@ const createWindow = () => {
 
   ipcMain.on('load-url', async (event, url) => {
     await createBrowserViews(url);
-  });
-
-  ipcMain.on('openResponsiveViews', async () => {
-    await createResponsiveViews();
   });
 
   ipcMain.on('show-modal', () => {
