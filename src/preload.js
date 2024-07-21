@@ -13,6 +13,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.send('syncScroll', sourceIndex, scrollPos);
     }
   },
+  tiltViews: () => ipcRenderer.send('tiltViews'),
   receive: (channel, func) => {
     ipcRenderer.on(channel, (event, ...args) => func(...args));
   },

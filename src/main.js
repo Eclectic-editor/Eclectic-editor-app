@@ -19,6 +19,7 @@ const editedStyles = {};
 let isSyncing = false;
 let lastScrollSource = -1;
 let debounceTimer;
+let isTilted = false;
 
 const createModalView = () => {
   if (modalView) {
@@ -279,6 +280,36 @@ const createBackgroundView = () => {
   );
 };
 
+const getViewConfigs = (tilted) =>
+  tilted
+    ? [
+        { width: 812, height: 375, scale: 0.5, x: 20 },
+        { width: 1024, height: 768, scale: 0.5, x: 812 * 0.5 + 40 },
+        {
+          width: 1440,
+          height: 900,
+          scale: 0.5,
+          x: 812 * 0.5 + 1024 * 0.5 + 60,
+        },
+      ]
+    : [
+        { width: 375, height: 812, scale: 0.5, x: 20 },
+        { width: 768, height: 1024, scale: 0.5, x: 375 * 0.5 + 40 },
+        { width: 1440, height: 900, scale: 0.5, x: 375 * 0.5 + 768 * 0.5 + 60 },
+      ];
+
+const setViewBounds = (view, config) => {
+  const scaledWidth = config.width * config.scale;
+  const scaledHeight = config.height * config.scale;
+
+  view.setBounds({
+    x: config.x,
+    y: 120,
+    width: scaledWidth,
+    height: scaledHeight,
+  });
+};
+
 const createResponsiveViews = async () => {
   if (responsiveViews.length > 0) {
     responsiveViews.forEach((view) => {
@@ -288,11 +319,7 @@ const createResponsiveViews = async () => {
     responsiveViews = [];
   }
 
-  const viewConfigs = [
-    { width: 375, height: 812, scale: 0.5, x: 20 },
-    { width: 768, height: 1024, scale: 0.5, x: 375 * 0.5 + 40 },
-    { width: 1440, height: 900, scale: 0.5, x: 375 * 0.5 + 768 * 0.5 + 60 },
-  ];
+  const viewConfigs = getViewConfigs(isTilted);
 
   const currentUrl = await webPageView.webContents.getURL();
 
@@ -307,29 +334,7 @@ const createResponsiveViews = async () => {
 
     mainWindow.addBrowserView(view);
 
-    const scaledWidth = config.width * config.scale;
-
-    let heightOffset;
-    switch (index) {
-      case 0:
-        heightOffset = 487;
-        break;
-      case 1:
-        heightOffset = 605;
-        break;
-      case 2:
-        heightOffset = 570;
-        break;
-      default:
-        heightOffset = 570;
-    }
-
-    view.setBounds({
-      x: config.x,
-      y: 120,
-      width: scaledWidth,
-      height: heightOffset,
-    });
+    setViewBounds(view, config);
 
     await view.webContents.loadURL(currentUrl);
 
@@ -355,6 +360,16 @@ const createResponsiveViews = async () => {
   if (webPageView) {
     mainWindow.removeBrowserView(webPageView);
   }
+};
+
+const toggleTiltResponsiveViews = async () => {
+  isTilted = !isTilted;
+  const viewConfigs = getViewConfigs(isTilted);
+
+  responsiveViews.forEach((view, index) => {
+    const config = viewConfigs[index];
+    setViewBounds(view, config);
+  });
 };
 
 const debounceSync =
@@ -395,6 +410,8 @@ ipcMain.on(
     }, 100);
   }, 150),
 );
+
+ipcMain.on('tiltViews', toggleTiltResponsiveViews);
 
 ipcMain.on('openResponsiveViews', async () => {
   responsiveViews.forEach((view) => {

@@ -16,12 +16,16 @@ function ResolutionSelector() {
     { label: 'Desktop', icon: iconDesktop, width: 1440, height: 900 },
   ];
 
-  const openModal = () => {
+  const handleOpenModal = () => {
     window.electronAPI.showModal();
   };
 
-  const openResponsiveViews = () => {
+  const handleOpenResponsiveViews = () => {
     window.electronAPI.openResponsiveViews();
+  };
+
+  const handleTiltViews = () => {
+    window.electronAPI.tiltViews();
   };
 
   return (
@@ -31,14 +35,18 @@ function ResolutionSelector() {
           <button
             type="button"
             className="resolution-button"
-            onClick={openModal}
+            onClick={handleOpenModal}
           >
             <img src={iconSetting} alt="setting" />
           </button>
           <div className="tooltip">Settings</div>
         </div>
         <div className="tooltip-container">
-          <button type="button" className="resolution-button">
+          <button
+            type="button"
+            className="resolution-button"
+            onClick={handleTiltViews}
+          >
             <img src={iconTilt} alt="tilt" />
           </button>
           <div className="tooltip">Tilt</div>
@@ -57,7 +65,7 @@ function ResolutionSelector() {
           <button
             type="button"
             className="resolution-button"
-            onClick={openResponsiveViews}
+            onClick={handleOpenResponsiveViews}
           >
             <img src={iconResponsive} alt="Responsive" />
           </button>
