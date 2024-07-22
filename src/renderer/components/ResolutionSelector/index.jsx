@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import iconSetting from '../../assets/icons/icon-setting.png';
 import iconTilt from '../../assets/icons/icon-tilt.png';
 import iconMobile from '../../assets/icons/icon-mobile.png';
 import iconTablet from '../../assets/icons/icon-tablet.png';
 import iconDesktop from '../../assets/icons/icon-desktop.png';
-import iconResponsive from '../../assets/icons/icon-responsive.png';
+import iconMultiView from '../../assets/icons/icon-multi-view.png';
 
 import './style.scss';
 
 function ResolutionSelector() {
+  const [isMultiViewMode, setIsMultiViewMode] = useState(false);
+
   const resolutions = [
     { label: 'Mobile', icon: iconMobile, width: 375, height: 667 },
     { label: 'Tablet', icon: iconTablet, width: 768, height: 1024 },
@@ -20,8 +22,9 @@ function ResolutionSelector() {
     window.electronAPI.showModal();
   };
 
-  const handleOpenResponsiveViews = () => {
-    window.electronAPI.openResponsiveViews();
+  const handleToggleMultiView = () => {
+    setIsMultiViewMode(!isMultiViewMode);
+    window.electronAPI.toggleMultiView();
   };
 
   const handleTiltViews = () => {
@@ -64,12 +67,12 @@ function ResolutionSelector() {
         <div className="tooltip-container">
           <button
             type="button"
-            className="resolution-button"
-            onClick={handleOpenResponsiveViews}
+            className={`resolution-button ${isMultiViewMode ? 'is-active' : ''}`}
+            onClick={handleToggleMultiView}
           >
-            <img src={iconResponsive} alt="Responsive" />
+            <img src={iconMultiView} alt="Multi-View" />
           </button>
-          <div className="tooltip">Responsive</div>
+          <div className="tooltip">Multi-View</div>
         </div>
       </div>
     </div>

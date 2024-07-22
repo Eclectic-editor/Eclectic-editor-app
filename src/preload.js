@@ -7,7 +7,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   elementClicked: (elementInfo) =>
     ipcRenderer.send('element-clicked', elementInfo),
   applyStyle: (style) => ipcRenderer.send('apply-style', style),
-  openResponsiveViews: () => ipcRenderer.send('openResponsiveViews'),
+  toggleMultiView: () => ipcRenderer.send('toggleMultiViews'),
   syncScroll: (sourceIndex, scrollPos) => {
     if (typeof scrollPos.x === 'number' && typeof scrollPos.y === 'number') {
       ipcRenderer.send('syncScroll', sourceIndex, scrollPos);

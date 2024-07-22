@@ -9,16 +9,17 @@ if (require('electron-squirrel-startup')) {
 let mainWindow;
 let editorView;
 let webPageView;
-let backgroundView;
+let backgroundView = null;
 let resolutionView;
 let loadingView;
 let modalView;
 let shadowView;
-let responsiveViews = [];
+let multiViews = [];
 const editedStyles = {};
 let isSyncing = false;
 let lastScrollSource = -1;
 let debounceTimer;
+let isMultiViewMode = false;
 let isTilted = false;
 let customResolutions = {
   mobile: { width: 375, height: 812 },
@@ -369,13 +370,13 @@ const setViewBounds = (view, config) => {
   view.webContents.setZoomFactor(config.scale);
 };
 
-const createResponsiveViews = async () => {
-  if (responsiveViews.length > 0) {
-    responsiveViews.forEach((view) => {
+const createMultiViews = async () => {
+  if (multiViews.length > 0) {
+    multiViews.forEach((view) => {
       mainWindow.removeBrowserView(view);
       view.webContents.destroy();
     });
-    responsiveViews = [];
+    multiViews = [];
   }
 
   const viewConfigs = getViewConfigs(isTilted);
@@ -407,7 +408,7 @@ const createResponsiveViews = async () => {
 
     await applyStyles(view, editedStyles);
 
-    responsiveViews.push(view);
+    multiViews.push(view);
   });
 
   await Promise.all(viewPromises);
@@ -421,11 +422,30 @@ const createResponsiveViews = async () => {
   }
 };
 
-const toggleTiltResponsiveViews = async () => {
+const restoreDefaultViews = async () => {
+  if (multiViews.length > 0) {
+    multiViews.forEach((view) => {
+      mainWindow.removeBrowserView(view);
+      view.webContents.destroy();
+    });
+    multiViews = [];
+  }
+
+  if (backgroundView) {
+    mainWindow.removeBrowserView(backgroundView);
+    backgroundView.webContents.destroy();
+    backgroundView = null;
+  }
+
+  mainWindow.addBrowserView(editorView);
+  mainWindow.addBrowserView(webPageView);
+};
+
+const toggleTiltMultiViews = async () => {
   isTilted = !isTilted;
   const viewConfigs = getViewConfigs(isTilted);
 
-  responsiveViews.forEach((view, index) => {
+  multiViews.forEach((view, index) => {
     const config = viewConfigs[index];
     setViewBounds(view, config);
   });
@@ -446,7 +466,7 @@ ipcMain.on(
 
     lastScrollSource = sourceIndex;
 
-    responsiveViews.forEach((view, index) => {
+    multiViews.forEach((view, index) => {
       if (index !== sourceIndex) {
         view.webContents.executeJavaScript(
           `
@@ -470,20 +490,34 @@ ipcMain.on(
   }, 150),
 );
 
-ipcMain.on('tiltViews', toggleTiltResponsiveViews);
+ipcMain.on('toggleMultiViews', async () => {
+  isMultiViewMode = !isMultiViewMode;
 
-ipcMain.on('openResponsiveViews', async () => {
-  responsiveViews.forEach((view) => {
+  if (isMultiViewMode) {
+    if (!backgroundView) {
+      createBackgroundView();
+    }
+
+    await createMultiViews();
+  } else {
+    await restoreDefaultViews();
+  }
+});
+
+ipcMain.on('tiltViews', toggleTiltMultiViews);
+
+ipcMain.on('openMultiViews', async () => {
+  multiViews.forEach((view) => {
     mainWindow.removeBrowserView(view);
     view.webContents.destroy();
   });
-  responsiveViews = [];
+  multiViews = [];
 
   if (!backgroundView) {
     createBackgroundView();
   }
 
-  await createResponsiveViews();
+  await createMultiViews();
 });
 
 const createWindow = () => {

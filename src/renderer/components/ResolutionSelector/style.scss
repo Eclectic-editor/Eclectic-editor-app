@@ -69,6 +69,11 @@
   height: 44px;
   cursor: pointer;
 
+  &.is-active {
+    border-radius: 8px;
+    background: var(--black);
+  }
+
   img {
     width: 24px;
     height: 24px;
