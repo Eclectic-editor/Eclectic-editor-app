@@ -24,7 +24,7 @@ let isTilted = false;
 let customResolutions = {
   mobile: { width: 375, height: 812 },
   tablet: { width: 768, height: 1024 },
-  desktop: { width: 1280, height: 800 },
+  desktop: { width: 1440, height: 900 },
 };
 
 const createModalView = () => {
@@ -84,7 +84,7 @@ const createModalView = () => {
     height: mainWindow.getBounds().height,
   });
 
-  const modalWidth = 500;
+  const modalWidth = 700;
   const modalHeight = 500;
   modalView.setBounds({
     x: (mainWindow.getBounds().width - modalWidth) / 2,
@@ -97,23 +97,6 @@ const createModalView = () => {
     modalView.webContents.send('currentResolutions', customResolutions);
   });
 };
-
-ipcMain.on('update-resolutions', (event, resolutions) => {
-  customResolutions = {
-    mobile: {
-      width: Number(resolutions.mobile.width),
-      height: Number(resolutions.mobile.height),
-    },
-    tablet: {
-      width: Number(resolutions.tablet.width),
-      height: Number(resolutions.tablet.height),
-    },
-    desktop: {
-      width: Number(resolutions.desktop.width),
-      height: Number(resolutions.desktop.height),
-    },
-  };
-});
 
 const createLoadingView = () => {
   if (loadingView) {
@@ -547,6 +530,27 @@ ipcMain.on('openMultiViews', async () => {
   }
 
   await createMultiViews();
+});
+
+ipcMain.on('update-resolutions', (event, resolutions) => {
+  customResolutions = {
+    mobile: {
+      width: Number(resolutions.mobile.width),
+      height: Number(resolutions.mobile.height),
+    },
+    tablet: {
+      width: Number(resolutions.tablet.width),
+      height: Number(resolutions.tablet.height),
+    },
+    desktop: {
+      width: Number(resolutions.desktop.width),
+      height: Number(resolutions.desktop.height),
+    },
+  };
+
+  if (isMultiViewMode) {
+    createMultiViews();
+  }
 });
 
 const createWindow = () => {

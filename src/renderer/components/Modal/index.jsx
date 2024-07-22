@@ -8,171 +8,166 @@ function Modal() {
     tablet: { width: 768, height: 1024 },
     desktop: { width: 1440, height: 900 },
   });
+  const [tempResolutions, setTempResolutions] = useState(resolutions);
+  const [errors, setErrors] = useState({
+    mobile: { width: '', height: '' },
+    tablet: { width: '', height: '' },
+    desktop: { width: '', height: '' },
+  });
+
+  const ranges = {
+    mobile: {
+      min: { width: 320, height: 480 },
+      max: { width: 767, height: 1024 },
+    },
+    tablet: {
+      min: { width: 768, height: 1024 },
+      max: { width: 1024, height: 1366 },
+    },
+    desktop: {
+      min: { width: 1025, height: 768 },
+      max: { width: 3840, height: 2160 },
+    },
+  };
 
   useEffect(() => {
-    window.electronAPI.receive('currentResolutions', (currentResolutions) => {
+    const handleCurrentResolutions = (currentResolutions) => {
       setResolutions(currentResolutions);
-    });
+      setTempResolutions(currentResolutions);
+    };
+
+    window.electronAPI.receive('currentResolutions', handleCurrentResolutions);
 
     return () => {
-      window.electronAPI.removeListener('currentResolutions', setResolutions);
+      window.electronAPI.removeListener(
+        'currentResolutions',
+        handleCurrentResolutions,
+      );
     };
   }, []);
 
-  const handleCloseModal = () => {
-    window.electronAPI.closeModal();
-  };
-
-  const handleInputChange = (device, dimension, value) => {
-    setResolutions((prev) => ({
-      ...prev,
+  const handleResolutionChange = (device, dimension, value) => {
+    const numValue = value.replace(/[^0-9]/g, '');
+    setTempResolutions((prevResolutions) => ({
+      ...prevResolutions,
       [device]: {
-        ...prev[device],
-        [dimension]: value,
+        ...prevResolutions[device],
+        [dimension]: numValue === '' ? '' : Number(numValue),
       },
     }));
   };
 
-  const handleSave = () => {
-    const isValid = (device, dimension, min, max) => {
-      const value = Number(resolutions[device][dimension]);
-      return value >= min && value <= max;
+  const validateResolutions = (tempRes) => {
+    const newErrors = {
+      mobile: { width: '', height: '' },
+      tablet: { width: '', height: '' },
+      desktop: { width: '', height: '' },
     };
+    let isValid = true;
 
-    if (
-      isValid('mobile', 'width', 320, 600) &&
-      isValid('mobile', 'height', 480, 800) &&
-      isValid('tablet', 'width', 601, 1024) &&
-      isValid('tablet', 'height', 801, 1280) &&
-      isValid('desktop', 'width', 1025, 2560) &&
-      isValid('desktop', 'height', 768, 1440)
-    ) {
-      window.electronAPI.updateResolutions(resolutions);
-      handleCloseModal();
-    } else {
-      alert('입력 값이 유효한 범위를 벗어났습니다.');
+    Object.keys(tempRes).forEach((device) => {
+      const { width, height } = tempRes[device];
+      const { min, max } = ranges[device];
+      if (width < min.width || width > max.width) {
+        newErrors[device].width =
+          `너비는 ${min.width}px에서 ${max.width}px 사이여야 합니다.`;
+        isValid = false;
+      }
+      if (height < min.height || height > max.height) {
+        newErrors[device].height =
+          `높이는 ${min.height}px에서 ${max.height}px 사이여야 합니다.`;
+        isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleSaveResolutions = () => {
+    if (validateResolutions(tempResolutions)) {
+      setResolutions(tempResolutions);
+      window.electronAPI.updateResolutions(tempResolutions);
+      window.electronAPI.closeModal();
     }
+  };
+
+  const handleCloseModal = () => {
+    window.electronAPI.closeModal();
   };
 
   return (
     <div className="modal-setting">
       <div className="content">
         <h1 className="title">Resolution Settings</h1>
-        <div className="box-setting">
-          <h2 className="title-resolution">Desktop</h2>
-          <div className="box-input">
-            <label htmlFor="desktop-width" className="blind">
-              Desktop Width
-            </label>
-            <input
-              type="number"
-              className="input-setting"
-              value={resolutions.desktop.width}
-              min="1025"
-              max="2560"
-              onChange={(e) =>
-                handleInputChange('desktop', 'width', e.target.value)
-              }
-              id="desktop-width"
-            />
+        {['desktop', 'tablet', 'mobile'].map((device) => (
+          <div className="box-setting" key={device}>
+            <h2 className="title-resolution">
+              {device.charAt(0).toUpperCase() + device.slice(1)}
+            </h2>
+            <div className="input-group">
+              <div className="box-input">
+                <label htmlFor={`${device}-width`} className="label-setting">
+                  Width
+                </label>
+                <input
+                  type="text"
+                  className="input-setting"
+                  id={`${device}-width`}
+                  value={tempResolutions[device].width}
+                  onChange={(e) =>
+                    handleResolutionChange(device, 'width', e.target.value)
+                  }
+                />
+                {errors[device].width && (
+                  <div className="error-message">{errors[device].width}</div>
+                )}
+                <div className="range-info">
+                  (최소: {ranges[device].min.width}px, 최대:{' '}
+                  {ranges[device].max.width}px)
+                </div>
+              </div>
+              <div className="box-input">
+                <label htmlFor={`${device}-height`} className="label-setting">
+                  Height
+                </label>
+                <input
+                  type="text"
+                  className="input-setting"
+                  id={`${device}-height`}
+                  value={tempResolutions[device].height}
+                  onChange={(e) =>
+                    handleResolutionChange(device, 'height', e.target.value)
+                  }
+                />
+                {errors[device].height && (
+                  <div className="error-message">{errors[device].height}</div>
+                )}
+                <div className="range-info">
+                  (최소: {ranges[device].min.height}px, 최대:{' '}
+                  {ranges[device].max.height}px)
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="box-input">
-            <label htmlFor="desktop-height" className="blind">
-              Desktop Height
-            </label>
-            <input
-              type="number"
-              className="input-setting"
-              value={resolutions.desktop.height}
-              min="768"
-              max="1440"
-              onChange={(e) =>
-                handleInputChange('desktop', 'height', e.target.value)
-              }
-              id="desktop-height"
-            />
-          </div>
-          <p className="resolution-range">최소: 1025x768, 최대: 2560x1440</p>
-        </div>
-        <div className="box-setting">
-          <h2 className="title-resolution">Tablet</h2>
-          <div className="box-input">
-            <label htmlFor="tablet-width" className="blind">
-              Tablet Width
-            </label>
-            <input
-              type="number"
-              className="input-setting"
-              value={resolutions.tablet.width}
-              min="601"
-              max="1024"
-              onChange={(e) =>
-                handleInputChange('tablet', 'width', e.target.value)
-              }
-              id="tablet-width"
-            />
-          </div>
-          <div className="box-input">
-            <label htmlFor="tablet-height" className="blind">
-              Tablet Height
-            </label>
-            <input
-              type="number"
-              className="input-setting"
-              value={resolutions.tablet.height}
-              min="801"
-              max="1280"
-              onChange={(e) =>
-                handleInputChange('tablet', 'height', e.target.value)
-              }
-              id="tablet-height"
-            />
-          </div>
-          <p className="resolution-range">최소: 601x801, 최대: 1024x1280</p>
-        </div>
-        <div className="box-setting">
-          <h2 className="title-resolution">Mobile</h2>
-          <div className="box-input">
-            <label htmlFor="mobile-width" className="blind">
-              Mobile Width
-            </label>
-            <input
-              type="number"
-              className="input-setting"
-              value={resolutions.mobile.width}
-              min="320"
-              max="600"
-              onChange={(e) =>
-                handleInputChange('mobile', 'width', e.target.value)
-              }
-              id="mobile-width"
-            />
-          </div>
-          <div className="box-input">
-            <label htmlFor="mobile-height" className="blind">
-              Mobile Height
-            </label>
-            <input
-              type="number"
-              className="input-setting"
-              value={resolutions.mobile.height}
-              min="480"
-              max="800"
-              onChange={(e) =>
-                handleInputChange('mobile', 'height', e.target.value)
-              }
-              id="mobile-height"
-            />
-          </div>
-          <p className="resolution-range">최소: 320x480, 최대: 600x800</p>
-        </div>
+        ))}
       </div>
-      <button type="button" className="button-save" onClick={handleSave}>
-        Save
-      </button>
-      <button type="button" className="button-close" onClick={handleCloseModal}>
-        Close
-      </button>
+      <div className="box-buttons">
+        <button
+          type="button"
+          className="button-save"
+          onClick={handleSaveResolutions}
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          className="button-close"
+          onClick={handleCloseModal}
+        >
+          Close
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,8 +1,7 @@
 .modal-setting {
   display: flex;
   flex-direction: column;
-  width: 500px;
-  height: 500px;
+  width: 700px;
   padding: 40px 20px 20px;
   border-radius: 8px;
   background: var(--white);
@@ -11,6 +10,7 @@
 
   .content {
     flex: 1;
+    padding-bottom: 120px;
 
     .title {
       font-weight: 700;
@@ -20,35 +20,87 @@
 
     .box-setting {
       display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 10px;
-      position: relative;
+      flex-direction: column;
       margin-top: 16px;
       padding-bottom: 20px;
     }
 
     .title-resolution {
-      margin-right: auto;
       font-size: 2rem;
+      margin-bottom: 20px;
     }
 
-    .input-setting {
-      width: 100px;
-      height: 40px;
-      padding: 10px;
-      font-size: 1.6rem;
-      box-sizing: border-box;
+    .input-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
     }
 
-    .resolution-range {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      margin-top: 5px;
-      font-size: 1.2rem;
-      color: var(--red);
+    .box-input {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      width: 48%;
+
+      &:after {
+        position: absolute;
+        top: 12px;
+        right: 15px;
+        font-size: 1.6rem;
+        color: var(--black);
+        content: 'px';
+      }
+
+      .label-setting {
+        position: absolute;
+        top: -12px;
+        left: 4px;
+        z-index: 1;
+        padding: 0 8px;
+        background: var(--white);
+        font-size: 1.6rem;
+      }
+
+      .input-setting {
+        width: 100%;
+        height: 50px;
+        padding: 10px 50px 10px 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: 'DegularDisplay', sans-serif;
+        font-size: 1.6rem;
+        box-sizing: border-box;
+
+        &:hover {
+          border-color: var(--black);
+        }
+      }
+
+      .error-message {
+        margin-top: 5px;
+        font-size: 1.2rem;
+        color: var(--red);
+      }
+
+      .range-info {
+        margin-top: 5px;
+        font-size: 1.2rem;
+        color: #888;
+      }
     }
+  }
+
+  .box-buttons {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    z-index: 10;
+    width: calc(100% - 20px);
+    margin: 0 10px;
+    padding: 10px 0;
+    border-top: 1px solid #e0e0e0;
+    background: var(--white);
+    box-sizing: border-box;
   }
 
   .button-save,
