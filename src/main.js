@@ -224,16 +224,15 @@ const createBrowserViews = async (url) => {
     });
 
     webPageView.webContents.on('did-finish-load', async () => {
-      try {
-        const script = fs.readFileSync(
-          path.join(__dirname, 'highlight.js'),
-          'utf8',
-        );
-        await webPageView.webContents.executeJavaScript(script);
-        removeLoadingView();
-      } catch (err) {
-        console.error('Error during JavaScript execution:', err);
+      if (!isMultiViewMode) {
+        webPageView.webContents.setZoomFactor(1);
       }
+      const script = fs.readFileSync(
+        path.join(__dirname, 'highlight.js'),
+        'utf8',
+      );
+      await webPageView.webContents.executeJavaScript(script);
+      removeLoadingView();
     });
   } catch (error) {
     console.error('Failed to load URL:', error);
@@ -346,6 +345,7 @@ const getViewConfigs = (tilted) =>
             60,
         },
       ];
+
 const setViewBounds = (view, config, index) => {
   const scaledWidth = Math.round(config.width * config.scale);
   const scaledHeight = Math.round(config.height * config.scale);
@@ -356,8 +356,6 @@ const setViewBounds = (view, config, index) => {
     width: scaledWidth,
     height: scaledHeight,
   });
-
-  view.webContents.setZoomFactor(config.scale);
 
   backgroundView.webContents.executeJavaScript(`
     (function() {
@@ -420,6 +418,8 @@ const createMultiViews = async () => {
 
     await applyStyles(view, editedStyles);
 
+    view.webContents.setZoomFactor(config.scale);
+
     multiViews.push(view);
   });
 
@@ -451,6 +451,14 @@ const restoreDefaultViews = async () => {
 
   mainWindow.addBrowserView(editorView);
   mainWindow.addBrowserView(webPageView);
+
+  webPageView.webContents.setZoomFactor(1);
+  webPageView.setBounds({
+    x: 400,
+    y: 80,
+    width: mainWindow.getBounds().width - 400,
+    height: mainWindow.getBounds().height - 80,
+  });
 };
 
 const toggleTiltMultiViews = async () => {
@@ -459,7 +467,11 @@ const toggleTiltMultiViews = async () => {
 
   multiViews.forEach((view, index) => {
     const config = viewConfigs[index];
-    setViewBounds(view, config, index);
+
+    if (config) {
+      setViewBounds(view, config, index);
+      view.webContents.setZoomFactor(config.scale);
+    }
   });
 };
 
