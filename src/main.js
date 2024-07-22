@@ -297,9 +297,17 @@ const createBackgroundView = () => {
         background-color: #303030;
         margin: 0;
         overflow: hidden;
+        position: relative;
+      }
+      .resolution-label {
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 5px;
+        z-index: 9999;
       }
     </style>
-    <div></div>
+    <div id="resolution-label-container"></div>
   `;
 
   backgroundView.webContents.loadURL(
@@ -355,19 +363,40 @@ const getViewConfigs = (tilted) =>
             60,
         },
       ];
-
-const setViewBounds = (view, config) => {
+const setViewBounds = (view, config, index) => {
   const scaledWidth = Math.round(config.width * config.scale);
   const scaledHeight = Math.round(config.height * config.scale);
 
   view.setBounds({
     x: config.x,
-    y: 120,
+    y: 140,
     width: scaledWidth,
     height: scaledHeight,
   });
 
   view.webContents.setZoomFactor(config.scale);
+
+  backgroundView.webContents.executeJavaScript(`
+    (function() {
+      let container = document.getElementById('resolution-label-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'resolution-label-container';
+        document.body.appendChild(container);
+      }
+
+      let label = document.getElementById('resolution-label-${index}');
+      if (!label) {
+        label = document.createElement('div');
+        label.id = 'resolution-label-${index}';
+        label.className = 'resolution-label';
+        container.appendChild(label);
+      }
+      label.style.left = '${config.x}px';
+      label.style.top = '20px';
+      label.textContent = '${config.width} x ${config.height}px';
+    })();
+  `);
 };
 
 const createMultiViews = async () => {
@@ -394,17 +423,17 @@ const createMultiViews = async () => {
 
     mainWindow.addBrowserView(view);
 
-    setViewBounds(view, config);
+    setViewBounds(view, config, index);
 
     await view.webContents.loadURL(currentUrl);
 
     const scrollManagerPath = path.join(__dirname, 'ScrollManager.js');
     const scrollManagerScript = fs.readFileSync(scrollManagerPath, 'utf8');
     await view.webContents.executeJavaScript(`
-            const viewIndex = ${index};
-            ${scrollManagerScript}
-            const scrollManager = new ScrollManager(viewIndex);
-          `);
+      const viewIndex = ${index};
+      ${scrollManagerScript}
+      const scrollManager = new ScrollManager(viewIndex);
+    `);
 
     await applyStyles(view, editedStyles);
 
@@ -447,7 +476,7 @@ const toggleTiltMultiViews = async () => {
 
   multiViews.forEach((view, index) => {
     const config = viewConfigs[index];
-    setViewBounds(view, config);
+    setViewBounds(view, config, index);
   });
 };
 
