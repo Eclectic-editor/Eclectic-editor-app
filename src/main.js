@@ -20,6 +20,11 @@ let isSyncing = false;
 let lastScrollSource = -1;
 let debounceTimer;
 let isTilted = false;
+let customResolutions = {
+  mobile: { width: 375, height: 812 },
+  tablet: { width: 768, height: 1024 },
+  desktop: { width: 1280, height: 800 },
+};
 
 const createModalView = () => {
   if (modalView) {
@@ -79,14 +84,35 @@ const createModalView = () => {
   });
 
   const modalWidth = 500;
-  const modalHeight = 400;
+  const modalHeight = 500;
   modalView.setBounds({
     x: (mainWindow.getBounds().width - modalWidth) / 2,
     y: (mainWindow.getBounds().height - modalHeight) / 2,
     width: modalWidth,
     height: modalHeight,
   });
+
+  modalView.webContents.once('did-finish-load', () => {
+    modalView.webContents.send('currentResolutions', customResolutions);
+  });
 };
+
+ipcMain.on('update-resolutions', (event, resolutions) => {
+  customResolutions = {
+    mobile: {
+      width: Number(resolutions.mobile.width),
+      height: Number(resolutions.mobile.height),
+    },
+    tablet: {
+      width: Number(resolutions.tablet.width),
+      height: Number(resolutions.tablet.height),
+    },
+    desktop: {
+      width: Number(resolutions.desktop.width),
+      height: Number(resolutions.desktop.height),
+    },
+  };
+});
 
 const createLoadingView = () => {
   if (loadingView) {
@@ -283,24 +309,55 @@ const createBackgroundView = () => {
 const getViewConfigs = (tilted) =>
   tilted
     ? [
-        { width: 812, height: 375, scale: 0.5, x: 20 },
-        { width: 1024, height: 768, scale: 0.5, x: 812 * 0.5 + 40 },
         {
-          width: 1440,
-          height: 900,
+          width: customResolutions.mobile.height,
+          height: customResolutions.mobile.width,
           scale: 0.5,
-          x: 812 * 0.5 + 1024 * 0.5 + 60,
+          x: 20,
+        },
+        {
+          width: customResolutions.tablet.height,
+          height: customResolutions.tablet.width,
+          scale: 0.5,
+          x: customResolutions.mobile.height * 0.5 + 40,
+        },
+        {
+          width: customResolutions.desktop.width,
+          height: customResolutions.desktop.height,
+          scale: 0.5,
+          x:
+            customResolutions.mobile.height * 0.5 +
+            customResolutions.tablet.height * 0.5 +
+            60,
         },
       ]
     : [
-        { width: 375, height: 812, scale: 0.5, x: 20 },
-        { width: 768, height: 1024, scale: 0.5, x: 375 * 0.5 + 40 },
-        { width: 1440, height: 900, scale: 0.5, x: 375 * 0.5 + 768 * 0.5 + 60 },
+        {
+          width: customResolutions.mobile.width,
+          height: customResolutions.mobile.height,
+          scale: 0.5,
+          x: 20,
+        },
+        {
+          width: customResolutions.tablet.width,
+          height: customResolutions.tablet.height,
+          scale: 0.5,
+          x: customResolutions.mobile.width * 0.5 + 40,
+        },
+        {
+          width: customResolutions.desktop.width,
+          height: customResolutions.desktop.height,
+          scale: 0.5,
+          x:
+            customResolutions.mobile.width * 0.5 +
+            customResolutions.tablet.width * 0.5 +
+            60,
+        },
       ];
 
 const setViewBounds = (view, config) => {
-  const scaledWidth = config.width * config.scale;
-  const scaledHeight = config.height * config.scale;
+  const scaledWidth = Math.round(config.width * config.scale);
+  const scaledHeight = Math.round(config.height * config.scale);
 
   view.setBounds({
     x: config.x,
@@ -308,6 +365,8 @@ const setViewBounds = (view, config) => {
     width: scaledWidth,
     height: scaledHeight,
   });
+
+  view.webContents.setZoomFactor(config.scale);
 };
 
 const createResponsiveViews = async () => {
@@ -341,10 +400,10 @@ const createResponsiveViews = async () => {
     const scrollManagerPath = path.join(__dirname, 'ScrollManager.js');
     const scrollManagerScript = fs.readFileSync(scrollManagerPath, 'utf8');
     await view.webContents.executeJavaScript(`
-      const viewIndex = ${index};
-      ${scrollManagerScript}
-      const scrollManager = new ScrollManager(viewIndex);
-    `);
+            const viewIndex = ${index};
+            ${scrollManagerScript}
+            const scrollManager = new ScrollManager(viewIndex);
+          `);
 
     await applyStyles(view, editedStyles);
 

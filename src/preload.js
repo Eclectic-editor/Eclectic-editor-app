@@ -14,6 +14,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     }
   },
   tiltViews: () => ipcRenderer.send('tiltViews'),
+  updateResolutions: (resolutions) =>
+    ipcRenderer.send('update-resolutions', resolutions),
   receive: (channel, func) => {
     ipcRenderer.on(channel, (event, ...args) => func(...args));
   },
