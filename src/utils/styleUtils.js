@@ -18,7 +18,11 @@ function getComputedStyleProperties(computedStyle) {
     wordWrap: computedStyle.wordWrap,
     whiteSpace: computedStyle.whiteSpace,
     verticalAlign: computedStyle.verticalAlign,
-    border: computedStyle.border,
     backgroundColor: computedStyle.backgroundColor,
+    backgroundImage: computedStyle.backgroundImage,
+    backgroundPosition: computedStyle.backgroundPosition,
+    backgroundSize: computedStyle.backgroundSize,
+    backgroundBlendMode: computedStyle.backgroundBlendMode,
+    backgroundAttachment: computedStyle.backgroundAttachment,
   };
 }
