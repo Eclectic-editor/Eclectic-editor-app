@@ -45,7 +45,12 @@ function Editor() {
         onBack={() => setSelectedCategory(null)}
       />
     ),
-    background: <BackgroundArea onBack={() => setSelectedCategory(null)} />,
+    background: (
+      <BackgroundArea
+        selectedElement={selectedElement}
+        onBack={() => setSelectedCategory(null)}
+      />
+    ),
     dimensions: <DimensionsArea onBack={() => setSelectedCategory(null)} />,
     spacing: <SpacingArea onBack={() => setSelectedCategory(null)} />,
     border: <BorderArea onBack={() => setSelectedCategory(null)} />,
