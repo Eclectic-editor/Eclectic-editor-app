@@ -721,8 +721,15 @@ const createWindow = () => {
   });
 
   ipcMain.on('element-clicked', async (event, elementInfo) => {
+    const script = fs.readFileSync(
+      path.join(__dirname, 'utils/styleUtils.js'),
+      'utf8',
+    );
+
     const style = await webPageView.webContents.executeJavaScript(`
       (function() {
+        ${script}
+
         function getElementXPath(element) {
           if (element.id !== '')
             return 'id("' + element.id + '")';
@@ -746,24 +753,7 @@ const createWindow = () => {
           const computedStyle = window.getComputedStyle(element);
           return {
             xPath: ${JSON.stringify(elementInfo.xPath)},
-            style: {
-              fontFamily: computedStyle.fontFamily,
-              color: computedStyle.color,
-              fontSize: computedStyle.fontSize,
-              lineHeight: computedStyle.lineHeight,
-              fontWeight: computedStyle.fontWeight,
-              fontStyle: computedStyle.fontStyle,
-              fontVariant: computedStyle.fontVariant,
-              textDecoration: computedStyle.textDecoration,
-              textAlign: computedStyle.textAlign,
-              textIndent: computedStyle.textIndent,
-              textTransform: computedStyle.textTransform,
-              wordSpacing: computedStyle.wordSpacing,
-              letterSpacing: computedStyle.letterSpacing,
-              wordWrap: computedStyle.wordWrap,
-              whiteSpace: computedStyle.whiteSpace,
-              verticalAlign: computedStyle.verticalAlign,
-            }
+            style: getComputedStyleProperties(computedStyle)
           };
         }
         return null;
