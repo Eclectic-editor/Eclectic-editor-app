@@ -20,6 +20,8 @@ let isSyncing = false;
 let lastScrollSource = -1;
 let debounceTimer;
 let isMultiViewMode = false;
+let isSingleModeTilted = false;
+let currentResolutionKey = 'desktop';
 let isTilted = false;
 let customResolutions = {
   mobile: { width: 375, height: 812 },
@@ -135,6 +137,52 @@ const removeLoadingView = () => {
   }
 };
 
+const createBackgroundView = (x = 0) => {
+  if (backgroundView) {
+    mainWindow.removeBrowserView(backgroundView);
+    backgroundView.webContents.destroy();
+  }
+
+  backgroundView = new BrowserView({
+    webPreferences: {
+      contextIsolation: true,
+      enableRemoteModule: false,
+    },
+  });
+
+  mainWindow.addBrowserView(backgroundView);
+
+  backgroundView.setBounds({
+    x,
+    y: 80,
+    width: mainWindow.getBounds().width - x,
+    height: mainWindow.getBounds().height - 80,
+  });
+
+  const backgroundHtml = `
+    <style>
+      body {
+        background-color: #303030;
+        margin: 0;
+        overflow: hidden;
+        position: relative;
+      }
+      .resolution-label {
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 5px;
+        z-index: 9999;
+      }
+    </style>
+    <div id="resolution-label-container"></div>
+  `;
+
+  backgroundView.webContents.loadURL(
+    `data:text/html;charset=utf-8,${encodeURIComponent(backgroundHtml)}`,
+  );
+};
+
 const createBrowserViews = async (url) => {
   if (editorView) {
     mainWindow.removeBrowserView(editorView);
@@ -146,6 +194,10 @@ const createBrowserViews = async (url) => {
 
   if (resolutionView) {
     mainWindow.removeBrowserView(resolutionView);
+  }
+
+  if (!backgroundView) {
+    createBackgroundView(400);
   }
 
   const toolHeight = 80;
@@ -256,47 +308,6 @@ const applyStyles = async (view, editedStyle) => {
   await Promise.all(promises);
 };
 
-const createBackgroundView = () => {
-  backgroundView = new BrowserView({
-    webPreferences: {
-      contextIsolation: true,
-      enableRemoteModule: false,
-    },
-  });
-
-  mainWindow.addBrowserView(backgroundView);
-
-  backgroundView.setBounds({
-    x: 0,
-    y: 80,
-    width: mainWindow.getBounds().width,
-    height: mainWindow.getBounds().height - 80,
-  });
-
-  const backgroundHtml = `
-    <style>
-      body {
-        background-color: #303030;
-        margin: 0;
-        overflow: hidden;
-        position: relative;
-      }
-      .resolution-label {
-        position: absolute;
-        background-color: rgba(0, 0, 0, 0.5);
-        color: white;
-        padding: 5px;
-        z-index: 9999;
-      }
-    </style>
-    <div id="resolution-label-container"></div>
-  `;
-
-  backgroundView.webContents.loadURL(
-    `data:text/html;charset=utf-8,${encodeURIComponent(backgroundHtml)}`,
-  );
-};
-
 const getViewConfigs = (tilted) =>
   tilted
     ? [
@@ -389,6 +400,14 @@ const createMultiViews = async () => {
     multiViews = [];
   }
 
+  if (backgroundView) {
+    mainWindow.removeBrowserView(backgroundView);
+    backgroundView.webContents.destroy();
+    backgroundView = null;
+  }
+
+  createBackgroundView(0);
+
   const viewConfigs = getViewConfigs(isTilted);
 
   const currentUrl = await webPageView.webContents.getURL();
@@ -449,6 +468,8 @@ const restoreDefaultViews = async () => {
     backgroundView = null;
   }
 
+  createBackgroundView(400);
+
   mainWindow.addBrowserView(editorView);
   mainWindow.addBrowserView(webPageView);
 
@@ -459,6 +480,33 @@ const restoreDefaultViews = async () => {
     width: mainWindow.getBounds().width - 400,
     height: mainWindow.getBounds().height - 80,
   });
+};
+
+const toggleTiltSingleView = () => {
+  if (currentResolutionKey === 'desktop') {
+    return;
+  }
+
+  isSingleModeTilted = !isSingleModeTilted;
+  const currentBounds = webPageView.getBounds();
+  const mainWindowBounds = mainWindow.getBounds();
+  const resolution = customResolutions[currentResolutionKey];
+
+  if (isSingleModeTilted) {
+    webPageView.setBounds({
+      x: currentBounds.x,
+      y: 80,
+      width: resolution.height,
+      height: mainWindowBounds.height - 80,
+    });
+  } else {
+    webPageView.setBounds({
+      x: currentBounds.x,
+      y: 80,
+      width: resolution.width,
+      height: mainWindowBounds.height - 80,
+    });
+  }
 };
 
 const toggleTiltMultiViews = async () => {
@@ -514,21 +562,21 @@ ipcMain.on(
   }, 150),
 );
 
-ipcMain.on('toggleMultiViews', async () => {
-  isMultiViewMode = !isMultiViewMode;
+ipcMain.on('enableMultiViewMode', async () => {
+  isMultiViewMode = true;
+  isSingleModeTilted = false;
+  isTilted = false;
 
-  if (isMultiViewMode) {
-    if (!backgroundView) {
-      createBackgroundView();
-    }
-
-    await createMultiViews();
-  } else {
-    await restoreDefaultViews();
-  }
+  await createMultiViews();
 });
 
-ipcMain.on('tiltViews', toggleTiltMultiViews);
+ipcMain.on('tiltViews', () => {
+  if (isMultiViewMode) {
+    toggleTiltMultiViews();
+  } else {
+    toggleTiltSingleView();
+  }
+});
 
 ipcMain.on('openMultiViews', async () => {
   multiViews.forEach((view) => {
@@ -562,7 +610,46 @@ ipcMain.on('update-resolutions', (event, resolutions) => {
 
   if (isMultiViewMode) {
     createMultiViews();
+  } else {
+    const currentResolution = customResolutions[currentResolutionKey];
+
+    webPageView.setBounds({
+      x: 400,
+      y: 80,
+      width: currentResolution.width,
+      height: mainWindow.getBounds().height - 80,
+    });
+
+    webPageView.webContents.setZoomFactor(1);
   }
+});
+
+ipcMain.on('setResolution', (event, resolutionKey) => {
+  currentResolutionKey = resolutionKey;
+  isMultiViewMode = false;
+  isSingleModeTilted = false;
+
+  restoreDefaultViews();
+
+  if (resolutionKey === 'desktop') {
+    webPageView.setBounds({
+      x: 400,
+      y: 80,
+      width: mainWindow.getBounds().width - 400,
+      height: mainWindow.getBounds().height - 80,
+    });
+  } else {
+    const resolution = customResolutions[resolutionKey];
+
+    webPageView.setBounds({
+      x: 400,
+      y: 80,
+      width: resolution.width,
+      height: mainWindow.getBounds().height - 80,
+    });
+  }
+
+  webPageView.webContents.setZoomFactor(1);
 });
 
 const createWindow = () => {

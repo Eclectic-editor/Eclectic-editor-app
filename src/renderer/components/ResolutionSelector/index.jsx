@@ -12,23 +12,28 @@ import './style.scss';
 function ResolutionSelector() {
   const [isMultiViewMode, setIsMultiViewMode] = useState(false);
 
-  const resolutions = [
-    { label: 'Mobile', icon: iconMobile, width: 375, height: 667 },
-    { label: 'Tablet', icon: iconTablet, width: 768, height: 1024 },
-    { label: 'Desktop', icon: iconDesktop, width: 1440, height: 900 },
-  ];
-
   const handleOpenModal = () => {
     window.electronAPI.showModal();
   };
 
-  const handleToggleMultiView = () => {
-    setIsMultiViewMode(!isMultiViewMode);
-    window.electronAPI.toggleMultiView();
+  const handleEnableMultiView = () => {
+    setIsMultiViewMode(true);
+    window.electronAPI.enableMultiViewMode();
   };
 
   const handleTiltViews = () => {
     window.electronAPI.tiltViews();
+  };
+
+  const handleSetResolution = (key) => {
+    setIsMultiViewMode(false);
+    window.electronAPI.setResolution(key);
+  };
+
+  const getIconByKey = (key) => {
+    if (key === 'mobile') return iconMobile;
+    if (key === 'tablet') return iconTablet;
+    return iconDesktop;
   };
 
   return (
@@ -56,19 +61,25 @@ function ResolutionSelector() {
         </div>
       </div>
       <div className="resolution-selector">
-        {resolutions.map((res) => (
-          <div className="tooltip-container" key={res.label}>
-            <button type="button" className="resolution-button">
-              <img src={res.icon} alt={res.label} />
+        {['mobile', 'tablet', 'desktop'].map((key) => (
+          <div className="tooltip-container" key={key}>
+            <button
+              type="button"
+              className="resolution-button"
+              onClick={() => handleSetResolution(key)}
+            >
+              <img src={getIconByKey(key)} alt={key} />
             </button>
-            <div className="tooltip">{res.label}</div>
+            <div className="tooltip">
+              {key.charAt(0).toUpperCase() + key.slice(1)}
+            </div>
           </div>
         ))}
         <div className="tooltip-container">
           <button
             type="button"
             className={`resolution-button ${isMultiViewMode ? 'is-active' : ''}`}
-            onClick={handleToggleMultiView}
+            onClick={handleEnableMultiView}
           >
             <img src={iconMultiView} alt="Multi-View" />
           </button>

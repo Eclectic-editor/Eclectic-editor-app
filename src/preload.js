@@ -7,7 +7,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   elementClicked: (elementInfo) =>
     ipcRenderer.send('element-clicked', elementInfo),
   applyStyle: (style) => ipcRenderer.send('apply-style', style),
-  toggleMultiView: () => ipcRenderer.send('toggleMultiViews'),
   syncScroll: (sourceIndex, scrollPos) => {
     if (typeof scrollPos.x === 'number' && typeof scrollPos.y === 'number') {
       ipcRenderer.send('syncScroll', sourceIndex, scrollPos);
@@ -16,6 +15,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   tiltViews: () => ipcRenderer.send('tiltViews'),
   updateResolutions: (resolutions) =>
     ipcRenderer.send('update-resolutions', resolutions),
+  setResolution: (resolution) => ipcRenderer.send('setResolution', resolution),
+  enableMultiViewMode: () => ipcRenderer.send('enableMultiViewMode'),
   receive: (channel, func) => {
     ipcRenderer.on(channel, (event, ...args) => func(...args));
   },
