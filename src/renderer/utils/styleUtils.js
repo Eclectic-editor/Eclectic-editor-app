@@ -3,12 +3,9 @@ export function convertColorFormat(color) {
     const content = color.slice(color.indexOf('(') + 1, color.indexOf(')'));
     const values = content.split(',').map((value) => value.trim());
 
-    const r = values[0];
-    const g = values[1];
-    const b = values[2];
+    const [r, g, b, a] = values;
 
     if (values.length === 4) {
-      const a = values[3];
       return `rgb(${r} ${g} ${b} / ${a})`;
     }
     return `rgb(${r} ${g} ${b})`;
