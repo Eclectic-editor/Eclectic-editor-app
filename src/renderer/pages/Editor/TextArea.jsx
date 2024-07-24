@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import useStyleStore from '../../store/styleStore';
 
 import EditorButton from '../../components/EditorButton';
 import EditorSection from '../../components/EditorSection';
@@ -13,6 +14,7 @@ import {
   WHITE_SPACE_ITEMS,
 } from '../../constants/text';
 import { toFixedTwo, camelToKebabCase } from '../../utils/styleUtils';
+import isStyleModified from '../../utils/ElementUtils';
 
 import './style.scss';
 
@@ -25,6 +27,9 @@ function TextArea({ onBack, selectedElement }) {
   const [wordWrap, setWordWrap] = useState('normal');
   const [whiteSpace, setWhiteSpace] = useState('normal');
   const [verticalAlign, setVerticalAlign] = useState('baseline');
+  const addModification = useStyleStore((state) => state.addModification);
+  const modifiedElements = useStyleStore((state) => state.modifiedElements);
+  const TEXT_AREA = 'text';
 
   useEffect(() => {
     if (selectedElement) {
@@ -49,15 +54,6 @@ function TextArea({ onBack, selectedElement }) {
       setVerticalAlign(selectedVerticalAlign || 'baseline');
     }
   }, [selectedElement]);
-
-  const applyStyle = (css) => {
-    if (selectedElement) {
-      window.electronAPI.applyStyle({
-        xPath: selectedElement.xPath,
-        cssText: css,
-      });
-    }
-  };
 
   const handleStyleChange = (property, value) => {
     switch (property) {
@@ -88,7 +84,13 @@ function TextArea({ onBack, selectedElement }) {
       default:
         break;
     }
-    applyStyle(`${camelToKebabCase(property)}: ${value}`);
+    if (selectedElement) {
+      addModification(selectedElement.xPath, TEXT_AREA, property);
+      window.electronAPI.applyStyle({
+        xPath: selectedElement.xPath,
+        cssText: `${camelToKebabCase(property)}: ${value}`,
+      });
+    }
   };
 
   return (
@@ -96,7 +98,15 @@ function TextArea({ onBack, selectedElement }) {
       <EditorButton text="Text" isActive onClick={onBack} />
       <article className="content-editor">
         <EditorSection>
-          <EditorTitle title="Text Align" />
+          <EditorTitle
+            title="Text Align"
+            isActive={isStyleModified(
+              'textAlign',
+              selectedElement,
+              modifiedElements,
+              TEXT_AREA,
+            )}
+          />
           <EditorDropdown
             defaultText={textAlign}
             items={TEXT_ALIGN_ITEMS}
@@ -104,7 +114,15 @@ function TextArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Text Indent (px)" />
+          <EditorTitle
+            title="Text Indent (px)"
+            isActive={isStyleModified(
+              'textIndent',
+              selectedElement,
+              modifiedElements,
+              TEXT_AREA,
+            )}
+          />
           <EditorUnitInput
             id="text-indent"
             label="Text Indent (px)"
@@ -114,7 +132,15 @@ function TextArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Text Transform" />
+          <EditorTitle
+            title="Text Transform"
+            isActive={isStyleModified(
+              'textTransform',
+              selectedElement,
+              modifiedElements,
+              TEXT_AREA,
+            )}
+          />
           <EditorDropdown
             defaultText={textTransform}
             items={TEXT_TRANSFORM_ITEMS}
@@ -122,7 +148,15 @@ function TextArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Word Spacing (px)" />
+          <EditorTitle
+            title="Word Spacing (px)"
+            isActive={isStyleModified(
+              'wordSpacing',
+              selectedElement,
+              modifiedElements,
+              TEXT_AREA,
+            )}
+          />
           <EditorUnitInput
             id="word-spacing"
             label="Word Spacing (px)"
@@ -132,7 +166,15 @@ function TextArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Letter Spacing (px)" />
+          <EditorTitle
+            title="Letter Spacing (px)"
+            isActive={isStyleModified(
+              'letterSpacing',
+              selectedElement,
+              modifiedElements,
+              TEXT_AREA,
+            )}
+          />
           <EditorUnitInput
             id="letter-spacing"
             label="Letter Spacing (px)"
@@ -142,7 +184,15 @@ function TextArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Word Wrap" />
+          <EditorTitle
+            title="Word Wrap"
+            isActive={isStyleModified(
+              'wordWrap',
+              selectedElement,
+              modifiedElements,
+              TEXT_AREA,
+            )}
+          />
           <EditorDropdown
             defaultText={wordWrap}
             items={['normal', 'break-word']}
@@ -150,7 +200,15 @@ function TextArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="White Space" />
+          <EditorTitle
+            title="White Space"
+            isActive={isStyleModified(
+              'whiteSpace',
+              selectedElement,
+              modifiedElements,
+              TEXT_AREA,
+            )}
+          />
           <EditorDropdown
             defaultText={whiteSpace}
             items={WHITE_SPACE_ITEMS}
@@ -158,7 +216,15 @@ function TextArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Vertical Align" />
+          <EditorTitle
+            title="Vertical Align"
+            isActive={isStyleModified(
+              'verticalAlign',
+              selectedElement,
+              modifiedElements,
+              TEXT_AREA,
+            )}
+          />
           <EditorDropdown
             defaultText={verticalAlign}
             items={VERTICAL_ALIGN_ITEMS}
