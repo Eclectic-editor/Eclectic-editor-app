@@ -62,8 +62,16 @@ function getXPath(element) {
 const updateInfoBoxPosition = (event, infoBoxParam) => {
   const infoBox = infoBoxParam;
   const rect = event.target.getBoundingClientRect();
+  const { scrollY } = window;
+
   infoBox.style.top = `${rect.top + window.scrollY - infoBox.offsetHeight}px`;
   infoBox.style.left = `${rect.left + window.scrollX}px`;
+
+  const infoBoxTop = parseFloat(infoBox.style.top);
+  if (infoBoxTop < scrollY) {
+    infoBox.style.top = `${rect.bottom + scrollY}px`;
+  }
+
   infoBox.style.backgroundColor =
     event.type === 'mouseover' ? '#00b894' : '#0984e3';
   infoBox.innerHTML = `<strong>${event.target.tagName.toLowerCase()}</strong>${
@@ -74,6 +82,8 @@ const updateInfoBoxPosition = (event, infoBoxParam) => {
       : ''
   }`;
 };
+
+let isFirstClick = true;
 
 const addEventListeners = (target) => {
   target.addEventListener('mouseover', (event) => {
@@ -100,13 +110,20 @@ const addEventListeners = (target) => {
     window.selectedElement = event.target;
 
     const xPath = getXPath(event.target);
-
-    const elementInfo = {
-      xPath,
-    };
+    const elementInfo = { xPath };
     window.electronAPI.elementClicked(elementInfo);
 
-    updateInfoBoxPosition(event, clickInfoBox);
+    if (isFirstClick) {
+      updateInfoBoxPosition(event, clickInfoBox);
+
+      requestAnimationFrame(() => {
+        updateInfoBoxPosition(event, clickInfoBox);
+      });
+
+      isFirstClick = false;
+    } else {
+      updateInfoBoxPosition(event, clickInfoBox);
+    }
   });
 };
 
