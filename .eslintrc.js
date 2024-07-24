@@ -36,6 +36,16 @@ module.exports = {
         some: ['nesting', 'id'],
       },
     ],
+    'prefer-destructuring': [
+      'error',
+      {
+        array: true,
+        object: true,
+      },
+      {
+        enforceForRenamedProperties: false,
+      },
+    ],
   },
   settings: {
     react: {
