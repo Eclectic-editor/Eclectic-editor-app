@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import useStyleStore from '../../store/styleStore';
 
 import EditorButton from '../../components/EditorButton';
 import EditorSection from '../../components/EditorSection';
@@ -15,6 +16,7 @@ import {
   BACKGROUND_ORIGIN_OPTIONS,
   BACKGROUND_CLIP_OPTIONS,
 } from '../../constants/background';
+import isStyleModified from '../../utils/ElementUtils';
 
 import './style.scss';
 
@@ -27,6 +29,9 @@ function BackgroundArea({ onBack, selectedElement }) {
   const [backgroundSize, setBackgroundSize] = useState('auto');
   const [backgroundOrigin, setBackgroundOrigin] = useState('padding-box');
   const [backgroundClip, setBackgroundClip] = useState('border-box');
+  const addModification = useStyleStore((state) => state.addModification);
+  const modifiedElements = useStyleStore((state) => state.modifiedElements);
+  const BACKGROUND_AREA = 'background';
 
   useEffect(() => {
     if (selectedElement) {
@@ -74,57 +79,57 @@ function BackgroundArea({ onBack, selectedElement }) {
     }
   }, [selectedElement]);
 
-  const applyStyle = (css) => {
-    if (selectedElement) {
-      window.electronAPI.applyStyle({
-        xPath: selectedElement.xPath,
-        cssText: css,
-      });
-    }
-  };
-
   const handleStyleChange = (property, value) => {
+    let css = '';
+
     switch (property) {
       case 'backgroundColor':
         setBackgroundColor(value);
-        applyStyle(`background-color: ${value}`);
+        css = `background-color: ${value}`;
         break;
       case 'backgroundImage':
         if (value === null || value === '') {
           setBackgroundImage('');
-          applyStyle('background-image: none');
+          css = 'background-image: none';
         } else {
           setBackgroundImage(value);
           const imageValue = `url("${value}")`;
-          applyStyle(`background-image: ${imageValue}`);
+          css = `background-image: ${imageValue}`;
         }
         break;
       case 'backgroundPosition':
         setBackgroundPosition(value);
-        applyStyle(`background-position: ${value}`);
+        css = `background-position: ${value}`;
         break;
       case 'backgroundRepeat':
         setBackgroundRepeat(value);
-        applyStyle(`background-repeat: ${value}`);
+        css = `background-repeat: ${value}`;
         break;
       case 'backgroundAttachment':
         setBackgroundAttachment(value);
-        applyStyle(`background-attachment: ${value}`);
+        css = `background-attachment: ${value}`;
         break;
       case 'backgroundSize':
         setBackgroundSize(value);
-        applyStyle(`background-size: ${value}`);
+        css = `background-size: ${value}`;
         break;
       case 'backgroundOrigin':
         setBackgroundOrigin(value);
-        applyStyle(`background-origin: ${value}`);
+        css = `background-origin: ${value}`;
         break;
       case 'backgroundClip':
         setBackgroundClip(value);
-        applyStyle(`background-clip: ${value}`);
+        css = `background-clip: ${value}`;
         break;
       default:
         break;
+    }
+    if (selectedElement) {
+      addModification(selectedElement.xPath, BACKGROUND_AREA, property);
+      window.electronAPI.applyStyle({
+        xPath: selectedElement.xPath,
+        cssText: css,
+      });
     }
   };
 
@@ -133,7 +138,15 @@ function BackgroundArea({ onBack, selectedElement }) {
       <EditorButton text="Background" isActive onClick={onBack} />
       <article className="content-editor">
         <EditorSection>
-          <EditorTitle title="Background Color" />
+          <EditorTitle
+            title="Background Color"
+            isActive={isStyleModified(
+              'backgroundColor',
+              selectedElement,
+              modifiedElements,
+              BACKGROUND_AREA,
+            )}
+          />
           <EditorColorInput
             id="background-color"
             label="Background Color"
@@ -142,7 +155,15 @@ function BackgroundArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Background Image" />
+          <EditorTitle
+            title="Background Image"
+            isActive={isStyleModified(
+              'backgroundImage',
+              selectedElement,
+              modifiedElements,
+              BACKGROUND_AREA,
+            )}
+          />
           <EditorImageInput
             id="background-image"
             label="Background Image"
@@ -153,14 +174,30 @@ function BackgroundArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Background Position" />
+          <EditorTitle
+            title="Background Position"
+            isActive={isStyleModified(
+              'backgroundPosition',
+              selectedElement,
+              modifiedElements,
+              BACKGROUND_AREA,
+            )}
+          />
           <EditorPositionSelector
             selectedPosition={backgroundPosition}
             onSelect={(value) => handleStyleChange('backgroundPosition', value)}
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Background Repeat" />
+          <EditorTitle
+            title="Background Repeat"
+            isActive={isStyleModified(
+              'backgroundRepeat',
+              selectedElement,
+              modifiedElements,
+              BACKGROUND_AREA,
+            )}
+          />
           <EditorDropdown
             defaultText={backgroundRepeat}
             items={BACKGROUND_REPEAT_OPTIONS}
@@ -168,7 +205,15 @@ function BackgroundArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Background Attachment" />
+          <EditorTitle
+            title="Background Attachment"
+            isActive={isStyleModified(
+              'backgroundAttachment',
+              selectedElement,
+              modifiedElements,
+              BACKGROUND_AREA,
+            )}
+          />
           <EditorDropdown
             defaultText={backgroundAttachment}
             items={BACKGROUND_ATTACHMENT_OPTIONS}
@@ -178,7 +223,15 @@ function BackgroundArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Background Size" />
+          <EditorTitle
+            title="Background Size"
+            isActive={isStyleModified(
+              'backgroundSize',
+              selectedElement,
+              modifiedElements,
+              BACKGROUND_AREA,
+            )}
+          />
           <EditorInput
             id="background-size-custom"
             label="Background Size Custom"
@@ -187,7 +240,15 @@ function BackgroundArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Background Origin" />
+          <EditorTitle
+            title="Background Origin"
+            isActive={isStyleModified(
+              'backgroundOrigin',
+              selectedElement,
+              modifiedElements,
+              BACKGROUND_AREA,
+            )}
+          />
           <EditorDropdown
             defaultText={backgroundOrigin}
             items={BACKGROUND_ORIGIN_OPTIONS}
@@ -195,7 +256,15 @@ function BackgroundArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Background Clip" />
+          <EditorTitle
+            title="Background Clip"
+            isActive={isStyleModified(
+              'backgroundClip',
+              selectedElement,
+              modifiedElements,
+              BACKGROUND_AREA,
+            )}
+          />
           <EditorDropdown
             defaultText={backgroundClip}
             items={BACKGROUND_CLIP_OPTIONS}
