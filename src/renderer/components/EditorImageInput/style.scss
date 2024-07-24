@@ -1,0 +1,30 @@
+.editor-image-input {
+  display: flex;
+  flex-direction: column;
+
+  .input-file-box {
+    display: flex;
+    align-items: center;
+
+    .image-file-input {
+      display: none;
+    }
+
+    .file-name {
+      padding: 5px 10px;
+      border-radius: 4px;
+      background: var(--gray);
+      font-family: 'DegularDisplay', sans-serif;
+      color: var(--black);
+      cursor: pointer;
+    }
+  }
+
+  .box-file-title {
+    display: block;
+    margin: 15px 0 10px;
+    font-size: 2rem;
+    font-family: 'DegularDisplay', sans-serif;
+    color: var(--white);
+  }
+}
