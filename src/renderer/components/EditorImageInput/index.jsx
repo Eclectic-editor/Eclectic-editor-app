@@ -46,7 +46,7 @@ function EditorImageInput({ id, label, value, onImageChange }) {
 
   return (
     <div className="editor-image-input">
-      <label htmlFor={`${id}-file`} className="editor-title">
+      <label htmlFor={`${id}-file`} className="blind">
         {label}
       </label>
       <div className="input-file-box">

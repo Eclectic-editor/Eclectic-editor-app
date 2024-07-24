@@ -6,6 +6,15 @@ import EditorTitle from '../../components/EditorTitle';
 import EditorColorInput from '../../components/EditorColorInput';
 import EditorPositionSelector from '../../components/EditorPositionSelector';
 import EditorImageInput from '../../components/EditorImageInput';
+import EditorDropdown from '../../components/EditorDropdown';
+import EditorInput from '../../components/EditorInput';
+
+import {
+  BACKGROUND_REPEAT_OPTIONS,
+  BACKGROUND_ATTACHMENT_OPTIONS,
+  BACKGROUND_ORIGIN_OPTIONS,
+  BACKGROUND_CLIP_OPTIONS,
+} from '../../constants/background';
 
 import './style.scss';
 
@@ -13,17 +22,32 @@ function BackgroundArea({ onBack, selectedElement }) {
   const [backgroundColor, setBackgroundColor] = useState('rgb(255, 255, 255)');
   const [backgroundPosition, setBackgroundPosition] = useState('left top');
   const [backgroundImage, setBackgroundImage] = useState('');
+  const [backgroundRepeat, setBackgroundRepeat] = useState('repeat');
+  const [backgroundAttachment, setBackgroundAttachment] = useState('scroll');
+  const [backgroundSize, setBackgroundSize] = useState('auto');
+  const [backgroundOrigin, setBackgroundOrigin] = useState('padding-box');
+  const [backgroundClip, setBackgroundClip] = useState('border-box');
 
   useEffect(() => {
     if (selectedElement) {
       const {
         backgroundColor: selectedBackgroundColor,
-        backgroundPosition: selectedBackgroundPosition,
         backgroundImage: selectedBackgroundImage,
+        backgroundPosition: selectedBackgroundPosition,
+        backgroundRepeat: selectedBackgroundRepeat,
+        backgroundAttachment: selectedBackgroundAttachment,
+        backgroundSize: selectedBackgroundSize,
+        backgroundOrigin: selectedBackgroundOrigin,
+        backgroundClip: selectedBackgroundClip,
       } = selectedElement.style;
 
       setBackgroundColor(selectedBackgroundColor || 'rgb(255, 255, 255)');
       setBackgroundPosition(selectedBackgroundPosition || 'left top');
+      setBackgroundRepeat(selectedBackgroundRepeat || 'repeat');
+      setBackgroundAttachment(selectedBackgroundAttachment || 'scroll');
+      setBackgroundSize(selectedBackgroundSize || 'auto');
+      setBackgroundOrigin(selectedBackgroundOrigin || 'padding-box');
+      setBackgroundClip(selectedBackgroundClip || 'border-box');
 
       if (selectedBackgroundImage) {
         let cleanedImage = selectedBackgroundImage.trim();
@@ -65,10 +89,6 @@ function BackgroundArea({ onBack, selectedElement }) {
         setBackgroundColor(value);
         applyStyle(`background-color: ${value}`);
         break;
-      case 'backgroundPosition':
-        setBackgroundPosition(value);
-        applyStyle(`background-position: ${value}`);
-        break;
       case 'backgroundImage':
         if (value === null || value === '') {
           setBackgroundImage('');
@@ -78,6 +98,30 @@ function BackgroundArea({ onBack, selectedElement }) {
           const imageValue = `url("${value}")`;
           applyStyle(`background-image: ${imageValue}`);
         }
+        break;
+      case 'backgroundPosition':
+        setBackgroundPosition(value);
+        applyStyle(`background-position: ${value}`);
+        break;
+      case 'backgroundRepeat':
+        setBackgroundRepeat(value);
+        applyStyle(`background-repeat: ${value}`);
+        break;
+      case 'backgroundAttachment':
+        setBackgroundAttachment(value);
+        applyStyle(`background-attachment: ${value}`);
+        break;
+      case 'backgroundSize':
+        setBackgroundSize(value);
+        applyStyle(`background-size: ${value}`);
+        break;
+      case 'backgroundOrigin':
+        setBackgroundOrigin(value);
+        applyStyle(`background-origin: ${value}`);
+        break;
+      case 'backgroundClip':
+        setBackgroundClip(value);
+        applyStyle(`background-clip: ${value}`);
         break;
       default:
         break;
@@ -98,13 +142,6 @@ function BackgroundArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Background Position" />
-          <EditorPositionSelector
-            selectedPosition={backgroundPosition}
-            onSelect={(value) => handleStyleChange('backgroundPosition', value)}
-          />
-        </EditorSection>
-        <EditorSection>
           <EditorTitle title="Background Image" />
           <EditorImageInput
             id="background-image"
@@ -113,6 +150,56 @@ function BackgroundArea({ onBack, selectedElement }) {
             onImageChange={(value) =>
               handleStyleChange('backgroundImage', value)
             }
+          />
+        </EditorSection>
+        <EditorSection>
+          <EditorTitle title="Background Position" />
+          <EditorPositionSelector
+            selectedPosition={backgroundPosition}
+            onSelect={(value) => handleStyleChange('backgroundPosition', value)}
+          />
+        </EditorSection>
+        <EditorSection>
+          <EditorTitle title="Background Repeat" />
+          <EditorDropdown
+            defaultText={backgroundRepeat}
+            items={BACKGROUND_REPEAT_OPTIONS}
+            onSelect={(value) => handleStyleChange('backgroundRepeat', value)}
+          />
+        </EditorSection>
+        <EditorSection>
+          <EditorTitle title="Background Attachment" />
+          <EditorDropdown
+            defaultText={backgroundAttachment}
+            items={BACKGROUND_ATTACHMENT_OPTIONS}
+            onSelect={(value) =>
+              handleStyleChange('backgroundAttachment', value)
+            }
+          />
+        </EditorSection>
+        <EditorSection>
+          <EditorTitle title="Background Size" />
+          <EditorInput
+            id="background-size-custom"
+            label="Background Size Custom"
+            value={backgroundSize}
+            onChange={(value) => handleStyleChange('backgroundSize', value)}
+          />
+        </EditorSection>
+        <EditorSection>
+          <EditorTitle title="Background Origin" />
+          <EditorDropdown
+            defaultText={backgroundOrigin}
+            items={BACKGROUND_ORIGIN_OPTIONS}
+            onSelect={(value) => handleStyleChange('backgroundOrigin', value)}
+          />
+        </EditorSection>
+        <EditorSection>
+          <EditorTitle title="Background Clip" />
+          <EditorDropdown
+            defaultText={backgroundClip}
+            items={BACKGROUND_CLIP_OPTIONS}
+            onSelect={(value) => handleStyleChange('backgroundClip', value)}
           />
         </EditorSection>
       </article>
