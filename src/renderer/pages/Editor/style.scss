@@ -6,6 +6,27 @@
   background: var(--black);
 }
 
+.button-editor-box {
+  position: relative;
+
+  .badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    background: var(--blue);
+    font-size: 1.6rem;
+    font-family: 'DegularDisplay', sans-serif;
+    color: var(--white);
+  }
+}
+
 .content-editor {
   flex: 1;
   background: var(--deep-gray);

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import useStyleStore from '../../store/styleStore';
 
 import EditorButton from '../../components/EditorButton';
 import EditorSection from '../../components/EditorSection';
@@ -19,6 +20,7 @@ import {
   toFixedTwo,
   camelToKebabCase,
 } from '../../utils/styleUtils';
+import isStyleModified from '../../utils/ElementUtils';
 
 import './style.scss';
 
@@ -31,6 +33,9 @@ function FontArea({ onBack, selectedElement }) {
   const [fontStyle, setFontStyle] = useState('normal');
   const [fontVariant, setFontVariant] = useState('normal');
   const [textDecoration, setTextDecoration] = useState('none');
+  const addModification = useStyleStore((state) => state.addModification);
+  const modifiedElements = useStyleStore((state) => state.modifiedElements);
+  const FONT_AREA = 'font';
 
   useEffect(() => {
     if (selectedElement) {
@@ -55,15 +60,6 @@ function FontArea({ onBack, selectedElement }) {
       setTextDecoration(selectedTextDecoration || 'none');
     }
   }, [selectedElement]);
-
-  const applyStyle = (css) => {
-    if (selectedElement) {
-      window.electronAPI.applyStyle({
-        xPath: selectedElement.xPath,
-        cssText: css,
-      });
-    }
-  };
 
   const handleStyleChange = (property, value) => {
     switch (property) {
@@ -94,7 +90,13 @@ function FontArea({ onBack, selectedElement }) {
       default:
         break;
     }
-    applyStyle(`${camelToKebabCase(property)}: ${value}`);
+    if (selectedElement) {
+      addModification(selectedElement.xPath, FONT_AREA, property);
+      window.electronAPI.applyStyle({
+        xPath: selectedElement.xPath,
+        cssText: `${camelToKebabCase(property)}: ${value}`,
+      });
+    }
   };
 
   return (
@@ -102,7 +104,15 @@ function FontArea({ onBack, selectedElement }) {
       <EditorButton text="Font" isActive onClick={onBack} />
       <article className="content-editor">
         <EditorSection>
-          <EditorTitle title="Font Family" />
+          <EditorTitle
+            title="Font Family"
+            isActive={isStyleModified(
+              'fontFamily',
+              selectedElement,
+              modifiedElements,
+              FONT_AREA,
+            )}
+          />
           <EditorDropdown
             defaultText={fontFamily}
             items={FONT_FAMILY_ITEMS}
@@ -110,7 +120,15 @@ function FontArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Color" />
+          <EditorTitle
+            title="Color"
+            isActive={isStyleModified(
+              'color',
+              selectedElement,
+              modifiedElements,
+              FONT_AREA,
+            )}
+          />
           <EditorColorInput
             id="font-color"
             label="Color"
@@ -119,7 +137,15 @@ function FontArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Font Size (px)" />
+          <EditorTitle
+            title="Font Size (px)"
+            isActive={isStyleModified(
+              'fontSize',
+              selectedElement,
+              modifiedElements,
+              FONT_AREA,
+            )}
+          />
           <EditorUnitInput
             id="font-size"
             label="Font Size (px)"
@@ -129,7 +155,16 @@ function FontArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Line Height (px)" />
+          <EditorTitle
+            title="Line Height (px)"
+            isActive={isStyleModified(
+              'lineHeight',
+              selectedElement,
+              modifiedElements,
+              FONT_AREA,
+            )}
+          />
+
           <EditorUnitInput
             id="line-height"
             label="Line Height (px)"
@@ -139,7 +174,15 @@ function FontArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Font Weight" />
+          <EditorTitle
+            title="Font Weight"
+            isActive={isStyleModified(
+              'fontWeight',
+              selectedElement,
+              modifiedElements,
+              FONT_AREA,
+            )}
+          />
           <EditorDropdown
             defaultText={fontWeight}
             items={FONT_WEIGHT_ITEMS}
@@ -147,7 +190,15 @@ function FontArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Font Style" />
+          <EditorTitle
+            title="Font Style"
+            isActive={isStyleModified(
+              'fontStyle',
+              selectedElement,
+              modifiedElements,
+              FONT_AREA,
+            )}
+          />
           <EditorDropdown
             defaultText={fontStyle}
             items={FONT_STYLE_ITEMS}
@@ -155,7 +206,16 @@ function FontArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Font Variant" />
+          <EditorTitle
+            title="Font Variant"
+            isActive={isStyleModified(
+              'fontVariant',
+              selectedElement,
+              modifiedElements,
+              FONT_AREA,
+            )}
+          />
+
           <EditorDropdown
             defaultText={fontVariant}
             items={FONT_VARIANT_ITEMS}
@@ -163,7 +223,16 @@ function FontArea({ onBack, selectedElement }) {
           />
         </EditorSection>
         <EditorSection>
-          <EditorTitle title="Text Decoration" />
+          <EditorTitle
+            title="Text Decoration"
+            isActive={isStyleModified(
+              'textDecoration',
+              selectedElement,
+              modifiedElements,
+              FONT_AREA,
+            )}
+          />
+
           <EditorDropdown
             defaultText={textDecoration}
             items={TEXT_DECORATION_ITEMS}

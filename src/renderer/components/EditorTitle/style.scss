@@ -2,4 +2,8 @@
   font-size: 2.4rem;
   font-family: 'DegularDisplay', sans-serif;
   color: var(--white);
+
+  &.is-active {
+    color: var(--blue);
+  }
 }
