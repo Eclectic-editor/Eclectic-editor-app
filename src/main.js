@@ -748,11 +748,34 @@ const createWindow = () => {
           return null;
         }
 
+        function getElementFriendlyIdentifier(element) {
+          if (element.id) {
+            return '#' + element.id;
+          }
+
+          const tagName = element.tagName.toLowerCase();
+
+          const classNames = element.className
+            ? '.' + element.className.split(' ').filter(className => className !== 'hover-highlight' && className !== 'click-highlight').join('.')
+            : '';
+
+          const siblings = Array.from(element.parentNode.children).filter(sibling => sibling.tagName === element.tagName);
+          const index = siblings.indexOf(element) + 1;
+          const identifier = \`\${tagName}\${classNames}\${index > 1 ? \`[\${index}]\` : ''}\`;
+
+          if (element.parentElement && element.parentElement.tagName.toLowerCase() !== 'html') {
+            return getElementFriendlyIdentifier(element.parentElement) + ' > ' + identifier;
+          }
+
+          return identifier;
+        }
+
         const element = document.evaluate(${JSON.stringify(elementInfo.xPath)}, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         if (element) {
           const computedStyle = window.getComputedStyle(element);
           return {
             xPath: ${JSON.stringify(elementInfo.xPath)},
+            friendlyIdentifier: getElementFriendlyIdentifier(element),
             style: getComputedStyleProperties(computedStyle)
           };
         }
