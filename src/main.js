@@ -1,4 +1,10 @@
-const { app, BrowserWindow, BrowserView, ipcMain } = require('electron');
+const {
+  app,
+  BrowserWindow,
+  BrowserView,
+  ipcMain,
+  dialog,
+} = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -787,6 +793,23 @@ const createWindow = () => {
       editedStyles[elementInfo.xPath] = style;
       editorView.webContents.send('element-style', style);
     }
+  });
+
+  ipcMain.on('save-document', (event, content) => {
+    dialog
+      .showSaveDialog({
+        title: 'Save Modified Styles',
+        defaultPath: 'modified_styles.txt',
+        filters: [{ name: 'Text Files', extensions: ['txt'] }],
+      })
+      .then((result) => {
+        if (!result.canceled && result.filePath) {
+          fs.writeFileSync(result.filePath, content);
+        }
+      })
+      .catch((err) => {
+        console.error('파일 저장 중 오류가 발생했습니다:', err);
+      });
   });
 };
 
