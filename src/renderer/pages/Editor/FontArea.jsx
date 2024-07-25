@@ -90,8 +90,16 @@ function FontArea({ onBack, selectedElement }) {
       default:
         break;
     }
+
     if (selectedElement) {
-      addModification(selectedElement.xPath, FONT_AREA, property);
+      addModification(
+        selectedElement.xPath,
+        FONT_AREA,
+        property,
+        value,
+        selectedElement.friendlyIdentifier,
+      );
+
       window.electronAPI.applyStyle({
         xPath: selectedElement.xPath,
         cssText: `${camelToKebabCase(property)}: ${value}`,
@@ -164,7 +172,6 @@ function FontArea({ onBack, selectedElement }) {
               FONT_AREA,
             )}
           />
-
           <EditorUnitInput
             id="line-height"
             label="Line Height (px)"
@@ -215,7 +222,6 @@ function FontArea({ onBack, selectedElement }) {
               FONT_AREA,
             )}
           />
-
           <EditorDropdown
             defaultText={fontVariant}
             items={FONT_VARIANT_ITEMS}
@@ -232,7 +238,6 @@ function FontArea({ onBack, selectedElement }) {
               FONT_AREA,
             )}
           />
-
           <EditorDropdown
             defaultText={textDecoration}
             items={TEXT_DECORATION_ITEMS}

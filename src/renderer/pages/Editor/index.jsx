@@ -11,12 +11,15 @@ import BorderArea from './BorderArea';
 
 import EDITOR_CATEGORY from '../../constants/editor';
 
+import iconDownload from '../../assets/icons/icon-download.png';
+
 import './style.scss';
 
 function Editor() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedElement, setSelectedElement] = useState(null);
   const modifiedElements = useStyleStore((state) => state.modifiedElements);
+  const getStylesDocument = useStyleStore((state) => state.getStylesDocument);
 
   useEffect(() => {
     const handleElementClicked = (elementInfo) => {
@@ -45,6 +48,11 @@ function Editor() {
     const count = Object.keys(modifiedElements[elementPath][area]).length;
 
     return count > 0 ? <span className="badge">{count}</span> : null;
+  };
+
+  const handleDownload = () => {
+    const document = getStylesDocument();
+    window.electronAPI.saveDocument(document);
   };
 
   const editorComponents = {
@@ -85,6 +93,16 @@ function Editor() {
             </div>
           ))
         : editorComponents[selectedCategory]}
+      <div className="button-container">
+        <button
+          type="button"
+          className="button-download-modified"
+          onClick={handleDownload}
+        >
+          <img src={iconDownload} alt="Download Modified Styles" />
+        </button>
+        <div className="tooltip">Download Modified Styles</div>
+      </div>
     </div>
   );
 }

@@ -124,8 +124,16 @@ function BackgroundArea({ onBack, selectedElement }) {
       default:
         break;
     }
+
     if (selectedElement) {
-      addModification(selectedElement.xPath, BACKGROUND_AREA, property);
+      addModification(
+        selectedElement.xPath,
+        BACKGROUND_AREA,
+        property,
+        value,
+        selectedElement.friendlyIdentifier,
+      );
+
       window.electronAPI.applyStyle({
         xPath: selectedElement.xPath,
         cssText: css,

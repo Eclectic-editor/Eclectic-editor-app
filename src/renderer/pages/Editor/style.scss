@@ -1,9 +1,69 @@
 .page-editor {
   display: flex;
   flex-direction: column;
+  position: relative;
   height: 100vh;
   border-right: 2px solid var(--gray);
   background: var(--black);
+
+  .button-container {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: inline-block;
+
+    &:hover {
+      .tooltip {
+        visibility: visible;
+        opacity: 1;
+      }
+    }
+  }
+
+  .button-download-modified {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border: 2px solid var(--white);
+    cursor: pointer;
+
+    img {
+      width: 24px;
+      height: 24px;
+      object-fit: cover;
+    }
+  }
+
+  .tooltip {
+    position: absolute;
+    top: 50%;
+    right: 120%;
+    transform: translateY(-50%);
+    z-index: 1;
+    padding: 10px 15px;
+    border-radius: 6px;
+    background: var(--gray);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-family: 'DegularDisplay', sans-serif;
+    color: var(--black);
+    text-align: center;
+  }
+
+  .tooltip::after {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent var(--gray);
+    content: '';
+  }
 }
 
 .button-editor-box {

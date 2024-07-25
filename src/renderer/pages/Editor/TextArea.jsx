@@ -84,8 +84,16 @@ function TextArea({ onBack, selectedElement }) {
       default:
         break;
     }
+
     if (selectedElement) {
-      addModification(selectedElement.xPath, TEXT_AREA, property);
+      addModification(
+        selectedElement.xPath,
+        TEXT_AREA,
+        property,
+        value,
+        selectedElement.friendlyIdentifier,
+      );
+
       window.electronAPI.applyStyle({
         xPath: selectedElement.xPath,
         cssText: `${camelToKebabCase(property)}: ${value}`,
