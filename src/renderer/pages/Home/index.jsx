@@ -18,9 +18,13 @@ function Home() {
 
   return (
     <section className={`page-intro ${isHidden ? 'is-hide' : ''}`}>
-      <IntroArea />
-      <LogoArea />
-      <InputArea url={url} setUrl={setUrl} handleSubmit={handleSubmit} />
+      {isHidden ? null : (
+        <>
+          <IntroArea />
+          <LogoArea />
+          <InputArea url={url} setUrl={setUrl} handleSubmit={handleSubmit} />
+        </>
+      )}
     </section>
   );
 }

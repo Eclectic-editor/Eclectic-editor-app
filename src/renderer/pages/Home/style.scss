@@ -11,7 +11,8 @@
   box-sizing: border-box;
 
   &.is-hide {
-    display: none;
+    background-color: var(--black);
+    background-image: none;
   }
 
   [class^='area-'] {

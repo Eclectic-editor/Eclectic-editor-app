@@ -12,12 +12,12 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
+let child;
 let mainWindow;
 let editorView;
 let webPageView;
 let backgroundView = null;
 let resolutionView;
-let loadingView;
 let modalView;
 let shadowView;
 let multiViews = [];
@@ -33,6 +33,26 @@ let customResolutions = {
   mobile: { width: 375, height: 812 },
   tablet: { width: 768, height: 1024 },
   desktop: { width: 1440, height: 900 },
+};
+
+const createModalLoading = () => {
+  child = new BrowserWindow({
+    parent: mainWindow,
+    modal: true,
+    show: false,
+    width: mainWindow.getBounds().width,
+    height: mainWindow.getBounds().height,
+  });
+
+  const loadingUrl = process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL
+    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}/loading`
+    : `file://${path.join(__dirname, '../dist/renderer/index.html')}/loading`;
+
+  child.loadURL(loadingUrl);
+
+  child.once('ready-to-show', () => {
+    child.show();
+  });
 };
 
 const createModalView = () => {
@@ -104,43 +124,6 @@ const createModalView = () => {
   modalView.webContents.once('did-finish-load', () => {
     modalView.webContents.send('currentResolutions', customResolutions);
   });
-};
-
-const createLoadingView = () => {
-  if (loadingView) {
-    mainWindow.removeBrowserView(loadingView);
-  }
-
-  loadingView = new BrowserView({
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      contextIsolation: true,
-      enableRemoteModule: false,
-    },
-  });
-
-  const loadingUrl = process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL
-    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}/loading`
-    : `file://${path.join(__dirname, '../dist/renderer/index.html')}/loading`;
-
-  loadingView.webContents.loadURL(loadingUrl);
-
-  mainWindow.addBrowserView(loadingView);
-
-  loadingView.setBounds({
-    x: 0,
-    y: 0,
-    width: mainWindow.getBounds().width,
-    height: mainWindow.getBounds().height,
-  });
-};
-
-const removeLoadingView = () => {
-  if (loadingView) {
-    mainWindow.removeBrowserView(loadingView);
-    loadingView.webContents.destroy();
-    loadingView = null;
-  }
 };
 
 const createBackgroundView = (x = 0) => {
@@ -259,7 +242,6 @@ const createBrowserViews = async (url) => {
     : `file://${path.join(__dirname, '../dist/renderer/index.html')}/resolution`;
 
   try {
-    await createLoadingView();
     await editorView.webContents.loadURL(editorUrl);
     await resolutionView.webContents.loadURL(resolutionUrl);
 
@@ -272,15 +254,6 @@ const createBrowserViews = async (url) => {
     });
     webPageView.webContents.loadURL(url);
 
-    mainWindow.removeBrowserView(loadingView);
-    mainWindow.addBrowserView(loadingView);
-    loadingView.setBounds({
-      x: 0,
-      y: 0,
-      width: mainWindow.getBounds().width,
-      height: mainWindow.getBounds().height,
-    });
-
     webPageView.webContents.on('did-finish-load', async () => {
       if (!isMultiViewMode) {
         webPageView.webContents.setZoomFactor(1);
@@ -290,7 +263,7 @@ const createBrowserViews = async (url) => {
         'utf8',
       );
       await webPageView.webContents.executeJavaScript(script);
-      removeLoadingView();
+      child.close();
     });
   } catch (error) {
     console.error('Failed to load URL:', error);
@@ -681,6 +654,7 @@ const createWindow = () => {
   }
 
   ipcMain.on('load-url', async (event, url) => {
+    await createModalLoading();
     await createBrowserViews(url);
   });
 
