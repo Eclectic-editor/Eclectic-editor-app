@@ -19,6 +19,7 @@ style.innerHTML = `
   background: rgba(255, 255, 255, 0.9);
   padding: 2px 5px;
   font-size: 14px;
+  color: #ffffff;
   z-index: 1000;
   pointer-events: none;
 }

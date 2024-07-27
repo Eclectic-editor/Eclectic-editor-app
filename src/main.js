@@ -130,6 +130,7 @@ const createBackgroundView = (x = 0) => {
   if (backgroundView) {
     mainWindow.removeBrowserView(backgroundView);
     backgroundView.webContents.destroy();
+    backgroundView = null;
   }
 
   backgroundView = new BrowserView({
@@ -183,10 +184,6 @@ const createBrowserViews = async (url) => {
 
   if (resolutionView) {
     mainWindow.removeBrowserView(resolutionView);
-  }
-
-  if (!backgroundView) {
-    createBackgroundView(400);
   }
 
   const toolHeight = 80;
@@ -246,6 +243,8 @@ const createBrowserViews = async (url) => {
     await resolutionView.webContents.loadURL(resolutionUrl);
 
     mainWindow.addBrowserView(webPageView);
+    webPageView.setBackgroundColor('#ffffff');
+    mainWindow.setTopBrowserView(webPageView);
     webPageView.setBounds({
       x: 400,
       y: toolHeight,
@@ -398,6 +397,8 @@ const createAndInitializeView = async (config, index, url) => {
   });
 
   mainWindow.addBrowserView(view);
+  view.setBackgroundColor('#ffffff');
+  mainWindow.setTopBrowserView(view);
   setViewBounds(view, config, index);
   await view.webContents.loadURL(url);
   view.webContents.setZoomFactor(config.scale);
@@ -458,12 +459,6 @@ const createMultiViews = async () => {
     multiViews = [];
   }
 
-  if (backgroundView) {
-    mainWindow.removeBrowserView(backgroundView);
-    backgroundView.webContents.destroy();
-    backgroundView = null;
-  }
-
   createBackgroundView(0);
 
   const viewConfigs = getViewConfigs(isTilted);
@@ -486,8 +481,6 @@ const restoreDefaultViews = async () => {
     backgroundView.webContents.destroy();
     backgroundView = null;
   }
-
-  createBackgroundView(400);
 
   mainWindow.addBrowserView(editorView);
   mainWindow.addBrowserView(webPageView);
@@ -629,6 +622,7 @@ const createWindow = () => {
       sandbox: false,
     },
     fullscreen: true,
+    backgroundColor: '#303030',
   });
 
   const startUrl =
