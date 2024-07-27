@@ -26,7 +26,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.send('update-resolutions', resolutions),
   setResolution: (resolution) => ipcRenderer.send('setResolution', resolution),
   enableMultiViewMode: () => ipcRenderer.send('enableMultiViewMode'),
-  saveDocument: (content) => ipcRenderer.send('save-document', content),
+  saveDocument: (content) => ipcRenderer.send('saveDocument', content),
   receive: (channel, func) => {
     ipcRenderer.on(channel, (event, ...args) => func(...args));
   },

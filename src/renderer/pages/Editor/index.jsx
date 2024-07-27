@@ -81,8 +81,9 @@ function Editor() {
 
   return (
     <div className="page-editor">
-      {!selectedCategory
-        ? EDITOR_CATEGORY.map((category) => (
+      {!selectedCategory ? (
+        <>
+          {EDITOR_CATEGORY.map((category) => (
             <div key={category.id} className="button-editor-box">
               <EditorButton
                 text={category.name}
@@ -91,18 +92,21 @@ function Editor() {
               {selectedElement &&
                 renderBadge(selectedElement.xPath, category.id)}
             </div>
-          ))
-        : editorComponents[selectedCategory]}
-      <div className="button-container">
-        <button
-          type="button"
-          className="button-download-modified"
-          onClick={handleDownload}
-        >
-          <img src={iconDownload} alt="Download Modified Styles" />
-        </button>
-        <div className="tooltip">Download Modified Styles</div>
-      </div>
+          ))}
+          <div className="button-container">
+            <button
+              type="button"
+              className="button-download-modified"
+              onClick={handleDownload}
+            >
+              <img src={iconDownload} alt="Download Modified Styles" />
+            </button>
+            <div className="tooltip">Download Modified Styles</div>
+          </div>
+        </>
+      ) : (
+        editorComponents[selectedCategory]
+      )}
     </div>
   );
 }

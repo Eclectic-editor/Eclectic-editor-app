@@ -24,18 +24,20 @@ const useStyleStore = create((set, get) => ({
   resetModifications: () => set({ modifiedElements: {} }),
   getStylesDocument: () => {
     const { modifiedElements } = get();
-    let document = '';
+    const document = {};
     Object.entries(modifiedElements).forEach(([xPath, element]) => {
       const identifier = element.friendlyIdentifier;
-      document += `Element: ${identifier}\nXPath: ${xPath}\n`;
+      document[xPath] = {
+        friendlyIdentifier: identifier,
+        styles: {},
+      };
       Object.entries(element).forEach(([area, properties]) => {
         if (area !== 'friendlyIdentifier') {
           Object.entries(properties).forEach(([property, value]) => {
-            document += `${property}: ${value};\n`;
+            document[xPath].styles[property] = value;
           });
         }
       });
-      document += '\n';
     });
     return document;
   },

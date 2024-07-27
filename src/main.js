@@ -791,16 +791,16 @@ function setupIpcListeners() {
     }
   });
 
-  ipcMain.on('save-document', (event, content) => {
+  ipcMain.on('saveDocument', (event, content) => {
     dialog
       .showSaveDialog({
         title: 'Save Modified Styles',
-        defaultPath: 'modified_styles.txt',
-        filters: [{ name: 'Text Files', extensions: ['txt'] }],
+        defaultPath: 'modified_styles.json',
+        filters: [{ name: 'JSON Files', extensions: ['json'] }],
       })
       .then((result) => {
         if (!result.canceled && result.filePath) {
-          fs.writeFileSync(result.filePath, content);
+          fs.writeFileSync(result.filePath, JSON.stringify(content, null, 2));
         }
       })
       .catch((err) => {
