@@ -7,10 +7,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
   elementClicked: (elementInfo) =>
     ipcRenderer.send('element-clicked', elementInfo),
   applyStyle: (style) => ipcRenderer.send('apply-style', style),
-  syncScroll: (sourceIndex, scrollPos) => {
-    if (typeof scrollPos.x === 'number' && typeof scrollPos.y === 'number') {
-      ipcRenderer.send('syncScroll', sourceIndex, scrollPos);
-    }
+  reportScroll: (sourceIndex, scrollX, scrollY) => {
+    ipcRenderer.send('reportScroll', sourceIndex, scrollX, scrollY);
+  },
+  onSyncScroll: (callback) => {
+    ipcRenderer.on('sync-scroll', (event, scrollX, scrollY) => {
+      callback(scrollX, scrollY);
+    });
+  },
+  syncScrollComplete: (viewIndex) => {
+    ipcRenderer.send('syncScrollComplete', viewIndex);
+  },
+  removeSyncScrollListener: (callback) => {
+    ipcRenderer.removeListener('sync-scroll', callback);
   },
   tiltViews: () => ipcRenderer.send('tiltViews'),
   updateResolutions: (resolutions) =>

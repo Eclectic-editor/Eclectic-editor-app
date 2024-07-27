@@ -22,9 +22,9 @@ let modalView;
 let shadowView;
 let multiViews = [];
 const editedStyles = {};
-let isSyncing = false;
-let lastScrollSource = -1;
-let debounceTimer;
+const syncStates = {};
+let isGlobalScrolling = false;
+let globalScrollDebounceTimer = null;
 let isMultiViewMode = false;
 let isSingleModeTilted = false;
 let currentResolutionKey = 'desktop';
@@ -272,15 +272,21 @@ const createBrowserViews = async (url) => {
 
 const applyStyles = async (view, editedStyle) => {
   const promises = Object.values(editedStyle).map(async ({ xPath, style }) => {
-    const styleString = Object.entries(style)
-      .map(([key, value]) => `${key}: ${value}`)
-      .join('; ');
+    const styleString = JSON.stringify(style)
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/"/g, '\\"');
+
     await view.webContents.executeJavaScript(`
       (function() {
         const selectedElement = document.evaluate(${JSON.stringify(xPath)}, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        if (selectedElement) {
-          selectedElement.style.cssText += '${styleString}';
-        }
+          if (selectedElement) {
+            const styles = JSON.parse('${styleString}');
+
+            for (const [key, value] of Object.entries(styles)) {
+              selectedElement.style[key] = value;
+            }
+          }
       })();
     `);
   });
@@ -367,15 +373,88 @@ const setViewBounds = (view, config, index) => {
       label.style.top = '20px';
       label.textContent = '${config.width} x ${config.height}px';
     })();
-  `);
+`);
+};
+
+const cleanUpViews = async (views) => {
+  await Promise.all(
+    views.map(async (view) => {
+      await view.webContents.executeJavaScript(
+        'if (window.cleanupScrollHandlers) window.cleanupScrollHandlers();',
+      );
+      mainWindow.removeBrowserView(view);
+      view.webContents.destroy();
+    }),
+  );
+};
+
+const createAndInitializeView = async (config, index, url) => {
+  const view = new BrowserView({
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      enableRemoteModule: false,
+    },
+  });
+
+  mainWindow.addBrowserView(view);
+  setViewBounds(view, config, index);
+  await view.webContents.loadURL(url);
+  view.webContents.setZoomFactor(config.scale);
+  syncStates[index] = { isScrolling: false };
+
+  await view.webContents.executeJavaScript(
+    `
+    (function() {
+      let isScrolling = false;
+      let lastScrollPosition = { x: 0, y: 0 };
+      let scrollDebounceTimer = null;
+
+      const scrollHandler = () => {
+        if (isScrolling) return;
+
+        clearTimeout(scrollDebounceTimer);
+        scrollDebounceTimer = setTimeout(() => {
+          const scrollX = window.scrollX / (document.documentElement.scrollWidth - window.innerWidth) || 0;
+          const scrollY = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) || 0;
+
+          if (Math.abs(scrollX - lastScrollPosition.x) > 0.001 || Math.abs(scrollY - lastScrollPosition.y) > 0.001) {
+            lastScrollPosition = { x: scrollX, y: scrollY };
+            window.electronAPI.reportScroll(${index}, scrollX, scrollY);
+          }
+        }, 50);
+      };
+
+      window.addEventListener('scroll', scrollHandler);
+
+      const syncScrollHandler = (scrollX, scrollY) => {
+        isScrolling = true;
+        const targetX = scrollX * (document.documentElement.scrollWidth - window.innerWidth);
+        const targetY = scrollY * (document.documentElement.scrollHeight - window.innerHeight);
+        window.scrollTo(targetX, targetY);
+        setTimeout(() => {
+          isScrolling = false;
+          window.electronAPI.syncScrollComplete(${index});
+        }, 100);
+      };
+
+      window.electronAPI.onSyncScroll(syncScrollHandler);
+
+      window.cleanupScrollHandlers = () => {
+        window.removeEventListener('scroll', scrollHandler);
+        window.electronAPI.removeSyncScrollListener(syncScrollHandler);
+      };
+    })();
+  `.replace(/\${index}/g, index),
+  );
+
+  await applyStyles(view, editedStyles);
+  multiViews.push(view);
 };
 
 const createMultiViews = async () => {
   if (multiViews.length > 0) {
-    multiViews.forEach((view) => {
-      mainWindow.removeBrowserView(view);
-      view.webContents.destroy();
-    });
+    await cleanUpViews(multiViews);
     multiViews = [];
   }
 
@@ -388,56 +467,17 @@ const createMultiViews = async () => {
   createBackgroundView(0);
 
   const viewConfigs = getViewConfigs(isTilted);
-
   const currentUrl = await webPageView.webContents.getURL();
 
-  const viewPromises = viewConfigs.map(async (config, index) => {
-    const view = new BrowserView({
-      webPreferences: {
-        preload: path.join(__dirname, 'preload.js'),
-        contextIsolation: true,
-        enableRemoteModule: false,
-      },
-    });
-
-    mainWindow.addBrowserView(view);
-
-    setViewBounds(view, config, index);
-
-    await view.webContents.loadURL(currentUrl);
-
-    const scrollManagerPath = path.join(__dirname, 'ScrollManager.js');
-    const scrollManagerScript = fs.readFileSync(scrollManagerPath, 'utf8');
-    await view.webContents.executeJavaScript(`
-      const viewIndex = ${index};
-      ${scrollManagerScript}
-      const scrollManager = new ScrollManager(viewIndex);
-    `);
-
-    await applyStyles(view, editedStyles);
-
-    view.webContents.setZoomFactor(config.scale);
-
-    multiViews.push(view);
-  });
-
-  await Promise.all(viewPromises);
-
-  if (editorView) {
-    mainWindow.removeBrowserView(editorView);
-  }
-
-  if (webPageView) {
-    mainWindow.removeBrowserView(webPageView);
-  }
+  await viewConfigs.reduce(async (previousPromise, config, index) => {
+    await previousPromise;
+    return createAndInitializeView(config, index, currentUrl);
+  }, Promise.resolve());
 };
 
 const restoreDefaultViews = async () => {
   if (multiViews.length > 0) {
-    multiViews.forEach((view) => {
-      mainWindow.removeBrowserView(view);
-      view.webContents.destroy();
-    });
+    await cleanUpViews(multiViews);
     multiViews = [];
   }
 
@@ -502,45 +542,6 @@ const toggleTiltMultiViews = async () => {
   });
 };
 
-const debounceSync =
-  (func, delay) =>
-  (...args) => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => func(...args), delay);
-  };
-
-ipcMain.on(
-  'syncScroll',
-  debounceSync((event, sourceIndex, scrollPercentage) => {
-    if (isSyncing || sourceIndex === lastScrollSource) return;
-    isSyncing = true;
-
-    lastScrollSource = sourceIndex;
-
-    multiViews.forEach((view, index) => {
-      if (index !== sourceIndex) {
-        view.webContents.executeJavaScript(
-          `
-        (function() {
-          window.removeEventListener('scroll', scrollManager.handleScroll);
-          const scrollX = ${scrollPercentage.x} * (document.documentElement.scrollWidth - window.innerWidth);
-          const scrollY = ${scrollPercentage.y} * (document.documentElement.scrollHeight - window.innerHeight);
-          window.scrollTo(scrollX || 0, scrollY || 0);
-          setTimeout(() => {
-            window.addEventListener('scroll', scrollManager.handleScroll);
-          }, 100);
-        })();`,
-        );
-      }
-    });
-
-    setTimeout(() => {
-      isSyncing = false;
-      lastScrollSource = -1;
-    }, 100);
-  }, 150),
-);
-
 ipcMain.on('enableMultiViewMode', async () => {
   isMultiViewMode = true;
   isSingleModeTilted = false;
@@ -555,20 +556,6 @@ ipcMain.on('tiltViews', () => {
   } else {
     toggleTiltSingleView();
   }
-});
-
-ipcMain.on('openMultiViews', async () => {
-  multiViews.forEach((view) => {
-    mainWindow.removeBrowserView(view);
-    view.webContents.destroy();
-  });
-  multiViews = [];
-
-  if (!backgroundView) {
-    createBackgroundView();
-  }
-
-  await createMultiViews();
 });
 
 ipcMain.on('update-resolutions', (event, resolutions) => {
@@ -652,6 +639,47 @@ const createWindow = () => {
   if (process.env.NODE_ENV === 'development') {
     mainWindow.webContents.openDevTools();
   }
+};
+
+function setupIpcListeners() {
+  ipcMain.on('reportScroll', (event, sourceIndex, scrollX, scrollY) => {
+    if (isGlobalScrolling) {
+      return;
+    }
+
+    isGlobalScrolling = true;
+
+    clearTimeout(globalScrollDebounceTimer);
+    globalScrollDebounceTimer = setTimeout(() => {
+      let syncCompleteCount = 0;
+      const totalViews = multiViews.length;
+
+      const handleSyncComplete = (syncEvent, viewIndex) => {
+        syncStates[viewIndex].isScrolling = false;
+        syncCompleteCount += 1;
+
+        if (syncCompleteCount === totalViews - 1) {
+          isGlobalScrolling = false;
+
+          Object.keys(syncStates).forEach((index) => {
+            syncStates[index].isScrolling = false;
+          });
+
+          ipcMain.removeListener('syncScrollComplete', handleSyncComplete);
+        }
+      };
+
+      ipcMain.on('syncScrollComplete', handleSyncComplete);
+
+      multiViews.forEach((view, index) => {
+        if (index !== sourceIndex && !syncStates[index].isScrolling) {
+          syncStates[index].isScrolling = true;
+
+          view.webContents.send('sync-scroll', scrollX, scrollY);
+        }
+      });
+    }, 50);
+  });
 
   ipcMain.on('load-url', async (event, url) => {
     await createModalLoading();
@@ -785,9 +813,10 @@ const createWindow = () => {
         console.error('파일 저장 중 오류가 발생했습니다:', err);
       });
   });
-};
+}
 
 app.whenReady().then(() => {
+  setupIpcListeners();
   createWindow();
 
   app.on('activate', () => {
