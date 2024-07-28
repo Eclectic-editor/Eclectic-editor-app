@@ -75,7 +75,12 @@ function Editor() {
       />
     ),
     dimensions: <DimensionsArea onBack={() => setSelectedCategory(null)} />,
-    spacing: <SpacingArea onBack={() => setSelectedCategory(null)} />,
+    spacing: (
+      <SpacingArea
+        selectedElement={selectedElement}
+        onBack={() => setSelectedCategory(null)}
+      />
+    ),
     border: <BorderArea onBack={() => setSelectedCategory(null)} />,
   };
 

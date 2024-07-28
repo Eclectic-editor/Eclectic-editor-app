@@ -24,5 +24,13 @@ function getComputedStyleProperties(computedStyle) {
     backgroundSize: computedStyle.backgroundSize,
     backgroundBlendMode: computedStyle.backgroundBlendMode,
     backgroundAttachment: computedStyle.backgroundAttachment,
+    paddingTop: computedStyle.paddingTop,
+    paddingRight: computedStyle.paddingRight,
+    paddingBottom: computedStyle.paddingBottom,
+    paddingLeft: computedStyle.paddingLeft,
+    marginTop: computedStyle.marginTop,
+    marginRight: computedStyle.marginRight,
+    marginBottom: computedStyle.marginBottom,
+    marginLeft: computedStyle.marginLeft,
   };
 }

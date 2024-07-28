@@ -37,30 +37,30 @@
     }
 
     & + .tooltip {
-    position: absolute;
-    top: 50%;
-    right: 120%;
-    transform: translateY(-50%);
-    z-index: 1;
+      position: absolute;
+      top: 50%;
+      right: 120%;
+      transform: translateY(-50%);
+      z-index: 1;
       padding: 10px;
-    border-radius: 6px;
-    background: var(--gray);
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.3s;
-    font-family: 'DegularDisplay', sans-serif;
+      border-radius: 6px;
+      background: var(--gray);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-family: 'DegularDisplay', sans-serif;
       color: var(--deep-gray);
-    text-align: center;
+      text-align: center;
 
       &::after {
-    position: absolute;
-    top: 50%;
-    left: 100%;
-    margin-top: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent transparent transparent var(--gray);
-    content: '';
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        margin-top: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent transparent transparent var(--gray);
+        content: '';
       }
     }
   }
@@ -108,5 +108,13 @@
   .editor-title + .editor-image-input,
   .editor-title + .editor-input {
     margin-top: 10px;
+  }
+}
+
+.spacing-section {
+  margin-top: 30px;
+
+  .editor-title {
+    margin-bottom: -20px;
   }
 }
