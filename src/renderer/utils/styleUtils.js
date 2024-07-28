@@ -36,3 +36,21 @@ export function camelToKebabCase(string) {
   }
   return result;
 }
+
+export const getNumericValue = (inputValue) => {
+  const parsed = parseFloat(inputValue);
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
+export const getUnit = (inputValue) => {
+  let unit = '';
+  for (let i = inputValue.length - 1; i >= 0; i -= 1) {
+    const char = inputValue[i];
+    if (Number.isNaN(Number(char)) && char !== ' ') {
+      unit = char + unit;
+    } else {
+      break;
+    }
+  }
+  return unit || 'px';
+};
