@@ -108,7 +108,7 @@ function FontArea({ onBack, selectedElement }) {
   };
 
   return (
-    <>
+    <div className="editor-container">
       <EditorButton text="Font" isActive onClick={onBack} />
       <article className="content-editor">
         <EditorSection>
@@ -245,7 +245,7 @@ function FontArea({ onBack, selectedElement }) {
           />
         </EditorSection>
       </article>
-    </>
+    </div>
   );
 }
 

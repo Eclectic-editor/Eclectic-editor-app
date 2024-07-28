@@ -142,7 +142,7 @@ function BackgroundArea({ onBack, selectedElement }) {
   };
 
   return (
-    <>
+    <div className="editor-container">
       <EditorButton text="Background" isActive onClick={onBack} />
       <article className="content-editor">
         <EditorSection>
@@ -280,7 +280,7 @@ function BackgroundArea({ onBack, selectedElement }) {
           />
         </EditorSection>
       </article>
-    </>
+    </div>
   );
 }
 

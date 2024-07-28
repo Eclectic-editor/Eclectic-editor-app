@@ -102,7 +102,7 @@ function TextArea({ onBack, selectedElement }) {
   };
 
   return (
-    <>
+    <div className="editor-container">
       <EditorButton text="Text" isActive onClick={onBack} />
       <article className="content-editor">
         <EditorSection>
@@ -240,7 +240,7 @@ function TextArea({ onBack, selectedElement }) {
           />
         </EditorSection>
       </article>
-    </>
+    </div>
   );
 }
 

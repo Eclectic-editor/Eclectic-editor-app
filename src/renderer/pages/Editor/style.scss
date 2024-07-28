@@ -35,26 +35,24 @@
       height: 24px;
       object-fit: cover;
     }
-  }
 
-  .tooltip {
+    & + .tooltip {
     position: absolute;
     top: 50%;
     right: 120%;
     transform: translateY(-50%);
     z-index: 1;
-    padding: 10px 15px;
+      padding: 10px;
     border-radius: 6px;
     background: var(--gray);
     white-space: nowrap;
     opacity: 0;
     transition: opacity 0.3s;
     font-family: 'DegularDisplay', sans-serif;
-    color: var(--black);
+      color: var(--deep-gray);
     text-align: center;
-  }
 
-  .tooltip::after {
+      &::after {
     position: absolute;
     top: 50%;
     left: 100%;
@@ -63,6 +61,17 @@
     border-style: solid;
     border-color: transparent transparent transparent var(--gray);
     content: '';
+      }
+    }
+  }
+}
+
+.editor-container {
+  .button-editor {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 100;
   }
 }
 
@@ -88,9 +97,9 @@
 }
 
 .content-editor {
-  flex: 1;
+  height: calc(100% - 36px);
+  padding: 12px 24px 24px;
   background: var(--deep-gray);
-  padding: 0 24px 24px;
   box-sizing: border-box;
 
   .editor-title + .editor-dropdown,
