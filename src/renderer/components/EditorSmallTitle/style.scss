@@ -1,0 +1,9 @@
+.editor-small-title {
+  font-size: 1.8rem;
+  font-family: 'DegularDisplay', sans-serif;
+  color: var(--white);
+
+  &.is-active {
+    color: var(--blue);
+  }
+}
