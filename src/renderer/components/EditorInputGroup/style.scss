@@ -7,39 +7,10 @@
     height: 4px;
     margin-right: 10px;
     background: var(--blue);
-    cursor: pointer;
   }
 
   .input-text {
-    width: 80px;
-    height: 48px;
-    padding: 2px 8px;
-    border: 1px solid var(--gray);
-    border-radius: 4px;
-    background: var(--black);
-    font-size: 1.6rem;
-    font-family: 'DegularDisplay', sans-serif;
-    color: var(--white);
-    box-sizing: border-box;
-  }
-
-  .box-buttons {
-    display: flex;
-    flex-direction: column;
-  }
-
-  button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    margin-left: 2px;
-    border: 1px solid var(--gray);
-    border-radius: 4px;
-    background: var(--black);
-    font-size: 1.6rem;
-    color: var(--white);
-    cursor: pointer;
+    width: 100px;
+    padding: 0 8px;
   }
 }

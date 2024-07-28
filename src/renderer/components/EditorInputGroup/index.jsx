@@ -1,34 +1,20 @@
 import React from 'react';
 
+import EditorInputWithButtons from '../EditorInputWithButtons';
+
+import { getUnit, getNumericValue } from '../../utils/styleUtils';
+
 import './style.scss';
 
 function EditorInputGroup({ value, onChange }) {
-  const getNumericValue = (inputValue) => parseFloat(inputValue) || 0;
-  const getUnit = (inputValue) =>
-    inputValue.replace(getNumericValue(inputValue), '') || 'px';
-
-  const handleInputChange = (e) => {
-    const newValue = e.target.value;
-    const unit = getUnit(value);
-    onChange(`${newValue}${unit}`);
+  const handleInputChange = (newValue) => {
+    onChange(newValue);
   };
 
   const handleRangeChange = (e) => {
     const numericValue = e.target.value;
     const unit = getUnit(value);
     onChange(`${numericValue}${unit}`);
-  };
-
-  const handleIncrement = () => {
-    const numericValue = getNumericValue(value);
-    const unit = getUnit(value);
-    onChange(`${numericValue + 1}${unit}`);
-  };
-
-  const handleDecrement = () => {
-    const numericValue = getNumericValue(value);
-    const unit = getUnit(value);
-    onChange(`${numericValue - 1}${unit}`);
   };
 
   return (
@@ -41,20 +27,7 @@ function EditorInputGroup({ value, onChange }) {
         value={getNumericValue(value)}
         onChange={handleRangeChange}
       />
-      <input
-        type="text"
-        className="input-text"
-        value={value}
-        onChange={handleInputChange}
-      />
-      <div className="box-buttons">
-        <button type="button" onClick={handleIncrement}>
-          +
-        </button>
-        <button type="button" onClick={handleDecrement}>
-          -
-        </button>
-      </div>
+      <EditorInputWithButtons value={value} onChange={handleInputChange} />
     </div>
   );
 }
