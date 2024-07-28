@@ -97,17 +97,13 @@
 }
 
 .content-editor {
-  height: calc(100% - 36px);
+  min-height: calc(100vh - 60px);
   padding: 12px 24px 24px;
   background: var(--deep-gray);
   box-sizing: border-box;
 
-  .editor-title + .editor-dropdown,
-  .editor-title + .editor-color-input,
-  .editor-title + .editor-position-selector,
-  .editor-title + .editor-image-input,
-  .editor-title + .editor-input {
-    margin-top: 10px;
+  .editor-title {
+    margin-bottom: 10px;
   }
 }
 

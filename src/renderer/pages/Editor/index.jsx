@@ -74,7 +74,12 @@ function Editor() {
         onBack={() => setSelectedCategory(null)}
       />
     ),
-    dimensions: <DimensionsArea onBack={() => setSelectedCategory(null)} />,
+    dimensions: (
+      <DimensionsArea
+        selectedElement={selectedElement}
+        onBack={() => setSelectedCategory(null)}
+      />
+    ),
     spacing: (
       <SpacingArea
         selectedElement={selectedElement}

@@ -32,5 +32,11 @@ function getComputedStyleProperties(computedStyle) {
     marginRight: computedStyle.marginRight,
     marginBottom: computedStyle.marginBottom,
     marginLeft: computedStyle.marginLeft,
+    width: computedStyle.width,
+    height: computedStyle.height,
+    maxWidth: computedStyle.maxWidth,
+    maxHeight: computedStyle.maxHeight,
+    minWidth: computedStyle.minWidth,
+    minHeight: computedStyle.minHeight,
   };
 }
