@@ -10,6 +10,7 @@ import SpacingArea from './SpacingArea';
 import BorderArea from './BorderArea';
 
 import EDITOR_CATEGORY from '../../constants/editor';
+import { BORDER_PROPERTIES } from '../../constants/border';
 
 import iconDownload from '../../assets/icons/icon-download.png';
 
@@ -18,7 +19,6 @@ import './style.scss';
 function Editor() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedElement, setSelectedElement] = useState(null);
-  const modifiedElements = useStyleStore((state) => state.modifiedElements);
   const getStylesDocument = useStyleStore((state) => state.getStylesDocument);
 
   useEffect(() => {
@@ -38,6 +38,8 @@ function Editor() {
   };
 
   const renderBadge = (elementPath, area) => {
+    const { modifiedElements } = useStyleStore.getState();
+
     if (
       !modifiedElements[elementPath] ||
       !modifiedElements[elementPath][area]
@@ -45,7 +47,26 @@ function Editor() {
       return null;
     }
 
-    const count = Object.keys(modifiedElements[elementPath][area]).length;
+    const modifications = modifiedElements[elementPath][area];
+    const groupKeys = BORDER_PROPERTIES;
+    const groupCount = new Set();
+
+    Object.keys(groupKeys).forEach((groupKey) => {
+      if (groupKeys[groupKey].some((prop) => modifications[prop])) {
+        groupCount.add(groupKey);
+      }
+    });
+
+    Object.keys(modifications).forEach((prop) => {
+      if (
+        !Object.values(groupKeys).flat().includes(prop) &&
+        prop !== 'groupProperties'
+      ) {
+        groupCount.add(prop);
+      }
+    });
+
+    const count = groupCount.size;
 
     return count > 0 ? <span className="badge">{count}</span> : null;
   };

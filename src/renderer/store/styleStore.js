@@ -2,23 +2,40 @@ import { create } from 'zustand';
 
 const useStyleStore = create((set, get) => ({
   modifiedElements: {},
-  addModification: (elementPath, area, property, value, friendlyIdentifier) =>
+  addModification: (
+    elementPath,
+    area,
+    property,
+    value,
+    friendlyIdentifier,
+    isGroup = false,
+  ) =>
     set((state) => {
       const element = state.modifiedElements[elementPath] || {};
       const areaModifications = element[area] || {};
 
-      return {
-        modifiedElements: {
-          ...state.modifiedElements,
-          [elementPath]: {
-            ...element,
-            [area]: {
-              ...areaModifications,
-              [property]: value,
-            },
-            friendlyIdentifier,
-          },
+      if (isGroup) {
+        Object.entries(value).forEach(([prop, val]) => {
+          areaModifications[prop] = val;
+        });
+        areaModifications.groupProperties =
+          areaModifications.groupProperties || {};
+        areaModifications.groupProperties[property] = true;
+      } else {
+        areaModifications[property] = value;
+      }
+
+      const newModifiedElements = {
+        ...state.modifiedElements,
+        [elementPath]: {
+          ...element,
+          [area]: areaModifications,
+          friendlyIdentifier,
         },
+      };
+
+      return {
+        modifiedElements: newModifiedElements,
       };
     }),
   resetModifications: () => set({ modifiedElements: {} }),
@@ -34,7 +51,9 @@ const useStyleStore = create((set, get) => ({
       Object.entries(element).forEach(([area, properties]) => {
         if (area !== 'friendlyIdentifier') {
           Object.entries(properties).forEach(([property, value]) => {
-            document[xPath].styles[property] = value;
+            if (property !== 'groupProperties') {
+              document[xPath].styles[property] = value;
+            }
           });
         }
       });
