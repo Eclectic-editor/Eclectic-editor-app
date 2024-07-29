@@ -7,7 +7,7 @@ import EditorTitle from '../../components/EditorTitle';
 import AllSpacingControl from '../../components/Spacing/AllSpacingControl';
 import HorizontalVerticalSpacingControl from '../../components/Spacing/HorizontalVerticalSpacingControl';
 import SpacingControl from '../../components/Spacing/SpacingControl';
-import SpacingSelection from '../../components/Spacing/SpacingSelection';
+import EditorOptionSelection from '../../components/EditorOptionSelection';
 
 import { camelToKebabCase } from '../../utils/styleUtils';
 
@@ -113,6 +113,8 @@ function SpacingArea({ onBack, selectedElement }) {
     left: marginLeft,
   };
 
+  const spacingOptions = ['individual', 'vertical', 'horizontal', 'all'];
+
   return (
     <div className="editor-container">
       <EditorButton text="Spacing" isActive onClick={onBack} />
@@ -125,7 +127,8 @@ function SpacingArea({ onBack, selectedElement }) {
         />
         <section className="spacing-section">
           <EditorTitle title="Padding" />
-          <SpacingSelection
+          <EditorOptionSelection
+            options={spacingOptions}
             selectedOption={selectedPaddingOption}
             setSelectedOption={setSelectedPaddingOption}
           />
@@ -188,7 +191,8 @@ function SpacingArea({ onBack, selectedElement }) {
         </section>
         <section className="spacing-section">
           <EditorTitle title="Margin" />
-          <SpacingSelection
+          <EditorOptionSelection
+            options={spacingOptions}
             selectedOption={selectedMarginOption}
             setSelectedOption={setSelectedMarginOption}
           />
