@@ -13,7 +13,7 @@ function SpacingControl({ title, values, onChange, selectedElement }) {
   const { top, right, bottom, left } = values;
 
   return (
-    <div className="spacing-controls">
+    <>
       <EditorSection>
         <EditorSmallTitle
           title={`${title} Top`}
@@ -74,7 +74,7 @@ function SpacingControl({ title, values, onChange, selectedElement }) {
           onChange={(value) => onChange('left', value)}
         />
       </EditorSection>
-    </div>
+    </>
   );
 }
 

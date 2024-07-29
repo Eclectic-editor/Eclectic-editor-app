@@ -24,12 +24,6 @@ export const formatRgba = (rgba) => {
 export const cleanFontFamily = (fontFamily) =>
   fontFamily.split(',')[0].replace(/['"]/g, '').trim();
 
-export const toFixedTwo = (value) => {
-  const numericValue = parseFloat(value);
-
-  return Number.isNaN(numericValue) ? value : `${numericValue.toFixed(2)}px`;
-};
-
 export const camelToKebabCase = (string) => {
   let result = '';
   for (let i = 0; i < string.length; i += 1) {

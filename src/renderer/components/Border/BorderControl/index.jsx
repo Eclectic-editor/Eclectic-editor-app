@@ -26,7 +26,7 @@ function BorderControl({
   const { modifiedElements } = useStyleStore((state) => state);
 
   return (
-    <div>
+    <>
       <EditorSection>
         <EditorSmallTitle
           title={`Border ${side} Width`}
@@ -92,7 +92,7 @@ function BorderControl({
           />
         </EditorSection>
       )}
-    </div>
+    </>
   );
 }
 

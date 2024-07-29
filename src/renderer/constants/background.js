@@ -1,3 +1,5 @@
+export const BACKGROUND_AREA = 'background';
+
 export const BACKGROUND_REPEAT_OPTIONS = [
   'repeat',
   'repeat-x',

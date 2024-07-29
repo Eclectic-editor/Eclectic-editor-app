@@ -11,6 +11,7 @@ import EditorDropdown from '../../components/EditorDropdown';
 import EditorInput from '../../components/EditorInput';
 
 import {
+  BACKGROUND_AREA,
   BACKGROUND_REPEAT_OPTIONS,
   BACKGROUND_ATTACHMENT_OPTIONS,
   BACKGROUND_ORIGIN_OPTIONS,
@@ -31,7 +32,6 @@ function BackgroundArea({ onBack, selectedElement }) {
   const [backgroundClip, setBackgroundClip] = useState('border-box');
   const addModification = useStyleStore((state) => state.addModification);
   const modifiedElements = useStyleStore((state) => state.modifiedElements);
-  const BACKGROUND_AREA = 'background';
 
   useEffect(() => {
     if (selectedElement) {

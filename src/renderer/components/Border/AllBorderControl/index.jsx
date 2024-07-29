@@ -81,7 +81,7 @@ function AllBorderControl({ title, initialValues, onChange, selectedElement }) {
   );
 
   return (
-    <div>
+    <>
       <EditorSection>
         <EditorSmallTitle
           title={`${title} Width`}
@@ -114,7 +114,7 @@ function AllBorderControl({ title, initialValues, onChange, selectedElement }) {
         />
         <EditorInputGroup value={radius} onChange={handleRadiusChange} />
       </EditorSection>
-    </div>
+    </>
   );
 }
 

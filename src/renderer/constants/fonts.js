@@ -1,3 +1,5 @@
+export const FONT_AREA = 'font';
+
 export const FONT_FAMILY_ITEMS = [
   'Arial',
   'Verdana',

@@ -1,3 +1,5 @@
+export const TEXT_AREA = 'text';
+
 export const TEXT_ALIGN_ITEMS = ['left', 'right', 'center', 'justify'];
 
 export const TEXT_TRANSFORM_ITEMS = [

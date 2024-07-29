@@ -58,7 +58,7 @@ function HorizontalVerticalSpacingControl({
     );
 
   return (
-    <div className="spacing-controls">
+    <>
       <EditorSection>
         <EditorSmallTitle
           title={title}
@@ -109,7 +109,7 @@ function HorizontalVerticalSpacingControl({
           }
         />
       </EditorSection>
-    </div>
+    </>
   );
 }
 
