@@ -86,7 +86,12 @@ function Editor() {
         onBack={() => setSelectedCategory(null)}
       />
     ),
-    border: <BorderArea onBack={() => setSelectedCategory(null)} />,
+    border: (
+      <BorderArea
+        selectedElement={selectedElement}
+        onBack={() => setSelectedCategory(null)}
+      />
+    ),
   };
 
   return (
