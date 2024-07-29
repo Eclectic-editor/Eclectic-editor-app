@@ -10,6 +10,7 @@ import SpacingArea from './SpacingArea';
 import BorderArea from './BorderArea';
 
 import EDITOR_CATEGORY from '../../constants/editor';
+import { SPACING_PROPERTIES } from '../../constants/spacing';
 import { BORDER_PROPERTIES } from '../../constants/border';
 
 import iconDownload from '../../assets/icons/icon-download.png';
@@ -48,7 +49,14 @@ function Editor() {
     }
 
     const modifications = modifiedElements[elementPath][area];
-    const groupKeys = BORDER_PROPERTIES;
+    let groupKeys = {};
+
+    if (area === 'border') {
+      groupKeys = BORDER_PROPERTIES;
+    } else if (area === 'spacing') {
+      groupKeys = SPACING_PROPERTIES;
+    }
+
     const groupCount = new Set();
 
     Object.keys(groupKeys).forEach((groupKey) => {
