@@ -5,19 +5,19 @@ import EditorSection from '../../EditorSection';
 import EditorSmallTitle from '../../EditorSmallTitle';
 import EditorInputGroup from '../../EditorInputGroup';
 
+import { SPACING_AREA } from '../../../constants/spacing';
 import isStyleModified from '../../../utils/ElementUtils';
 
 function HorizontalVerticalSpacingControl({
   title,
   topValue,
   bottomValue,
-  initialValue = '0px',
+  initialValue,
   onChange,
   selectedElement,
 }) {
   const { modifiedElements } = useStyleStore((state) => state);
   const [combinedValue, setCombinedValue] = useState(initialValue);
-  const SPACING_AREA = 'spacing';
 
   useEffect(() => {
     setCombinedValue(initialValue);

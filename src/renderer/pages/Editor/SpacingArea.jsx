@@ -9,6 +9,7 @@ import HorizontalVerticalSpacingControl from '../../components/Spacing/Horizonta
 import SpacingControl from '../../components/Spacing/SpacingControl';
 import EditorOptionSelection from '../../components/EditorOptionSelection';
 
+import { SPACING_AREA, SPACING_OPTIONS } from '../../constants/spacing';
 import { camelToKebabCase } from '../../utils/styleUtils';
 
 import './style.scss';
@@ -27,7 +28,6 @@ function SpacingArea({ onBack, selectedElement }) {
   const [selectedMarginOption, setSelectedMarginOption] =
     useState('individual');
   const addModification = useStyleStore((state) => state.addModification);
-  const SPACING_AREA = 'spacing';
 
   useEffect(() => {
     if (selectedElement) {
@@ -113,8 +113,6 @@ function SpacingArea({ onBack, selectedElement }) {
     left: marginLeft,
   };
 
-  const spacingOptions = ['individual', 'vertical', 'horizontal', 'all'];
-
   return (
     <div className="editor-container">
       <EditorButton text="Spacing" isActive onClick={onBack} />
@@ -128,7 +126,7 @@ function SpacingArea({ onBack, selectedElement }) {
         <section className="spacing-section">
           <EditorTitle title="Padding" />
           <EditorOptionSelection
-            options={spacingOptions}
+            options={SPACING_OPTIONS}
             selectedOption={selectedPaddingOption}
             setSelectedOption={setSelectedPaddingOption}
           />
@@ -150,7 +148,7 @@ function SpacingArea({ onBack, selectedElement }) {
               title="Vertical Padding"
               topValue={paddingTop}
               bottomValue={paddingBottom}
-              initialValue="0px"
+              initialValue={paddingTop}
               onChange={(position, value) =>
                 handleStyleChange(
                   `padding${position.charAt(0).toUpperCase() + position.slice(1)}`,
@@ -165,7 +163,7 @@ function SpacingArea({ onBack, selectedElement }) {
               title="Horizontal Padding"
               topValue={paddingRight}
               bottomValue={paddingLeft}
-              initialValue="0px"
+              initialValue={paddingRight}
               onChange={(position, value) =>
                 handleStyleChange(
                   `padding${position.charAt(0).toUpperCase() + position.slice(1)}`,
@@ -178,7 +176,7 @@ function SpacingArea({ onBack, selectedElement }) {
           {selectedPaddingOption === 'all' && (
             <AllSpacingControl
               title="All Padding"
-              initialValue="0px"
+              initialValue={paddingTop}
               onChange={(value) => {
                 handleStyleChange('paddingTop', value);
                 handleStyleChange('paddingRight', value);
@@ -192,7 +190,7 @@ function SpacingArea({ onBack, selectedElement }) {
         <section className="spacing-section">
           <EditorTitle title="Margin" />
           <EditorOptionSelection
-            options={spacingOptions}
+            options={SPACING_OPTIONS}
             selectedOption={selectedMarginOption}
             setSelectedOption={setSelectedMarginOption}
           />
@@ -214,7 +212,7 @@ function SpacingArea({ onBack, selectedElement }) {
               title="Vertical Margin"
               topValue={marginTop}
               bottomValue={marginBottom}
-              initialValue="0px"
+              initialValue={marginTop}
               onChange={(position, value) =>
                 handleStyleChange(
                   `margin${position.charAt(0).toUpperCase() + position.slice(1)}`,
@@ -229,7 +227,7 @@ function SpacingArea({ onBack, selectedElement }) {
               title="Horizontal Margin"
               topValue={marginRight}
               bottomValue={marginLeft}
-              initialValue="0px"
+              initialValue={marginRight}
               onChange={(position, value) =>
                 handleStyleChange(
                   `margin${position.charAt(0).toUpperCase() + position.slice(1)}`,
@@ -242,7 +240,7 @@ function SpacingArea({ onBack, selectedElement }) {
           {selectedMarginOption === 'all' && (
             <AllSpacingControl
               title="All Margin"
-              initialValue="0px"
+              initialValue={marginTop}
               onChange={(value) => {
                 handleStyleChange('marginTop', value);
                 handleStyleChange('marginRight', value);

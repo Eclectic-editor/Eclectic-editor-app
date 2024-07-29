@@ -20,7 +20,7 @@ function BorderControl({
   borderColor,
   borderStyle,
   borderRadius,
-  handleStyleChange,
+  onChange,
   selectedElement,
 }) {
   const { modifiedElements } = useStyleStore((state) => state);
@@ -39,7 +39,7 @@ function BorderControl({
         />
         <EditorInputGroup
           value={borderWidth}
-          onChange={(value) => handleStyleChange(`border${side}Width`, value)}
+          onChange={(value) => onChange(`border${side}Width`, value)}
         />
       </EditorSection>
       <EditorSection>
@@ -54,7 +54,7 @@ function BorderControl({
         />
         <EditorColorInput
           value={borderColor}
-          onChange={(value) => handleStyleChange(`border${side}Color`, value)}
+          onChange={(value) => onChange(`border${side}Color`, value)}
         />
       </EditorSection>
       <EditorSection>
@@ -70,7 +70,7 @@ function BorderControl({
         <EditorDropdown
           defaultText={borderStyle}
           items={BORDER_STYLE}
-          onSelect={(value) => handleStyleChange(`border${side}Style`, value)}
+          onSelect={(value) => onChange(`border${side}Style`, value)}
         />
       </EditorSection>
       {BORDER_RADIUS_PROPERTIES[side] && (
@@ -87,7 +87,7 @@ function BorderControl({
           <EditorInputGroup
             value={borderRadius}
             onChange={(value) =>
-              handleStyleChange(BORDER_RADIUS_PROPERTIES[side], value)
+              onChange(BORDER_RADIUS_PROPERTIES[side], value)
             }
           />
         </EditorSection>
