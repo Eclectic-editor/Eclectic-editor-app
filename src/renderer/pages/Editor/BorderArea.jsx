@@ -237,7 +237,7 @@ function BorderArea({ onBack, selectedElement }) {
               borderColor={borderTopColor}
               borderStyle={borderTopStyle}
               borderRadius={borderTopLeftRadius}
-              handleStyleChange={handleStyleChange}
+              onChange={handleStyleChange}
               selectedElement={selectedElement}
             />
           )}
@@ -248,7 +248,7 @@ function BorderArea({ onBack, selectedElement }) {
               borderColor={borderRightColor}
               borderStyle={borderRightStyle}
               borderRadius={borderTopRightRadius}
-              handleStyleChange={handleStyleChange}
+              onChange={handleStyleChange}
               selectedElement={selectedElement}
             />
           )}
@@ -259,7 +259,7 @@ function BorderArea({ onBack, selectedElement }) {
               borderColor={borderBottomColor}
               borderStyle={borderBottomStyle}
               borderRadius={borderBottomRightRadius}
-              handleStyleChange={handleStyleChange}
+              onChange={handleStyleChange}
               selectedElement={selectedElement}
             />
           )}
@@ -270,7 +270,7 @@ function BorderArea({ onBack, selectedElement }) {
               borderColor={borderLeftColor}
               borderStyle={borderLeftStyle}
               borderRadius={borderBottomLeftRadius}
-              handleStyleChange={handleStyleChange}
+              onChange={handleStyleChange}
               selectedElement={selectedElement}
             />
           )}
