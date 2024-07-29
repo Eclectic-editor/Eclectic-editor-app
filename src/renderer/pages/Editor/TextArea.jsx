@@ -5,15 +5,16 @@ import EditorButton from '../../components/EditorButton';
 import EditorSection from '../../components/EditorSection';
 import EditorTitle from '../../components/EditorTitle';
 import EditorDropdown from '../../components/EditorDropdown';
-import EditorUnitInput from '../../components/EditorUnitInput';
+import EditorInputGroup from '../../components/EditorInputGroup';
 
 import {
+  TEXT_AREA,
   TEXT_ALIGN_ITEMS,
   TEXT_TRANSFORM_ITEMS,
   VERTICAL_ALIGN_ITEMS,
   WHITE_SPACE_ITEMS,
 } from '../../constants/text';
-import { toFixedTwo, camelToKebabCase } from '../../utils/styleUtils';
+import { camelToKebabCase } from '../../utils/styleUtils';
 import isStyleModified from '../../utils/ElementUtils';
 
 import './style.scss';
@@ -29,7 +30,6 @@ function TextArea({ onBack, selectedElement }) {
   const [verticalAlign, setVerticalAlign] = useState('baseline');
   const addModification = useStyleStore((state) => state.addModification);
   const modifiedElements = useStyleStore((state) => state.modifiedElements);
-  const TEXT_AREA = 'text';
 
   useEffect(() => {
     if (selectedElement) {
@@ -45,10 +45,10 @@ function TextArea({ onBack, selectedElement }) {
       } = selectedElement.style;
 
       setTextAlign(selectedTextAlign || 'left');
-      setTextIndent(toFixedTwo(selectedTextIndent) || '0px');
+      setTextIndent(selectedTextIndent || '0px');
       setTextTransform(selectedTextTransform || 'none');
-      setWordSpacing(toFixedTwo(selectedWordSpacing) || '0px');
-      setLetterSpacing(toFixedTwo(selectedLetterSpacing) || '0px');
+      setWordSpacing(selectedWordSpacing || '0px');
+      setLetterSpacing(selectedLetterSpacing || '0px');
       setWordWrap(selectedWordWrap || 'normal');
       setWhiteSpace(selectedWhiteSpace || 'normal');
       setVerticalAlign(selectedVerticalAlign || 'baseline');
@@ -123,7 +123,7 @@ function TextArea({ onBack, selectedElement }) {
         </EditorSection>
         <EditorSection>
           <EditorTitle
-            title="Text Indent (px)"
+            title="Text Indent"
             isActive={isStyleModified(
               'textIndent',
               selectedElement,
@@ -131,10 +131,7 @@ function TextArea({ onBack, selectedElement }) {
               TEXT_AREA,
             )}
           />
-          <EditorUnitInput
-            id="text-indent"
-            label="Text Indent (px)"
-            unit="px"
+          <EditorInputGroup
             value={textIndent}
             onChange={(value) => handleStyleChange('textIndent', value)}
           />
@@ -157,7 +154,7 @@ function TextArea({ onBack, selectedElement }) {
         </EditorSection>
         <EditorSection>
           <EditorTitle
-            title="Word Spacing (px)"
+            title="Word Spacing"
             isActive={isStyleModified(
               'wordSpacing',
               selectedElement,
@@ -165,17 +162,14 @@ function TextArea({ onBack, selectedElement }) {
               TEXT_AREA,
             )}
           />
-          <EditorUnitInput
-            id="word-spacing"
-            label="Word Spacing (px)"
-            unit="px"
+          <EditorInputGroup
             value={wordSpacing}
             onChange={(value) => handleStyleChange('wordSpacing', value)}
           />
         </EditorSection>
         <EditorSection>
           <EditorTitle
-            title="Letter Spacing (px)"
+            title="Letter Spacing"
             isActive={isStyleModified(
               'letterSpacing',
               selectedElement,
@@ -183,10 +177,7 @@ function TextArea({ onBack, selectedElement }) {
               TEXT_AREA,
             )}
           />
-          <EditorUnitInput
-            id="letter-spacing"
-            label="Letter Spacing (px)"
-            unit="px"
+          <EditorInputGroup
             value={letterSpacing}
             onChange={(value) => handleStyleChange('letterSpacing', value)}
           />

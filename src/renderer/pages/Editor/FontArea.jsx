@@ -6,20 +6,17 @@ import EditorSection from '../../components/EditorSection';
 import EditorTitle from '../../components/EditorTitle';
 import EditorDropdown from '../../components/EditorDropdown';
 import EditorColorInput from '../../components/EditorColorInput';
-import EditorUnitInput from '../../components/EditorUnitInput';
+import EditorInputGroup from '../../components/EditorInputGroup';
 
 import {
+  FONT_AREA,
   FONT_FAMILY_ITEMS,
   FONT_WEIGHT_ITEMS,
   FONT_STYLE_ITEMS,
   FONT_VARIANT_ITEMS,
   TEXT_DECORATION_ITEMS,
 } from '../../constants/fonts';
-import {
-  cleanFontFamily,
-  toFixedTwo,
-  camelToKebabCase,
-} from '../../utils/styleUtils';
+import { cleanFontFamily, camelToKebabCase } from '../../utils/styleUtils';
 import isStyleModified from '../../utils/ElementUtils';
 
 import './style.scss';
@@ -27,15 +24,14 @@ import './style.scss';
 function FontArea({ onBack, selectedElement }) {
   const [fontFamily, setFontFamily] = useState('Arial');
   const [color, setColor] = useState('rgb(255, 255, 255)');
-  const [fontSize, setFontSize] = useState('17px');
-  const [lineHeight, setLineHeight] = useState('24px');
+  const [fontSize, setFontSize] = useState('0px');
+  const [lineHeight, setLineHeight] = useState('0px');
   const [fontWeight, setFontWeight] = useState('normal');
   const [fontStyle, setFontStyle] = useState('normal');
   const [fontVariant, setFontVariant] = useState('normal');
   const [textDecoration, setTextDecoration] = useState('none');
   const addModification = useStyleStore((state) => state.addModification);
   const modifiedElements = useStyleStore((state) => state.modifiedElements);
-  const FONT_AREA = 'font';
 
   useEffect(() => {
     if (selectedElement) {
@@ -52,8 +48,8 @@ function FontArea({ onBack, selectedElement }) {
 
       setFontFamily(cleanFontFamily(selectedFontFamily) || 'Arial');
       setColor(selectedColor || 'rgb(255, 255, 255)');
-      setFontSize(toFixedTwo(selectedFontSize) || '17px');
-      setLineHeight(toFixedTwo(selectedLineHeight) || '24px');
+      setFontSize(selectedFontSize || '17px');
+      setLineHeight(selectedLineHeight || '24px');
       setFontWeight(selectedFontWeight || 'normal');
       setFontStyle(selectedFontStyle || 'normal');
       setFontVariant(selectedFontVariant || 'normal');
@@ -146,7 +142,7 @@ function FontArea({ onBack, selectedElement }) {
         </EditorSection>
         <EditorSection>
           <EditorTitle
-            title="Font Size (px)"
+            title="Font Size"
             isActive={isStyleModified(
               'fontSize',
               selectedElement,
@@ -154,17 +150,14 @@ function FontArea({ onBack, selectedElement }) {
               FONT_AREA,
             )}
           />
-          <EditorUnitInput
-            id="font-size"
-            label="Font Size (px)"
-            unit="px"
+          <EditorInputGroup
             value={fontSize}
             onChange={(value) => handleStyleChange('fontSize', value)}
           />
         </EditorSection>
         <EditorSection>
           <EditorTitle
-            title="Line Height (px)"
+            title="Line Height"
             isActive={isStyleModified(
               'lineHeight',
               selectedElement,
@@ -172,10 +165,7 @@ function FontArea({ onBack, selectedElement }) {
               FONT_AREA,
             )}
           />
-          <EditorUnitInput
-            id="line-height"
-            label="Line Height (px)"
-            unit="px"
+          <EditorInputGroup
             value={lineHeight}
             onChange={(value) => handleStyleChange('lineHeight', value)}
           />
