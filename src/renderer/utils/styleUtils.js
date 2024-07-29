@@ -1,4 +1,4 @@
-export function convertColorFormat(color) {
+export const convertColorFormat = (color) => {
   if (color.startsWith('rgb')) {
     const content = color.slice(color.indexOf('(') + 1, color.indexOf(')'));
     const values = content.split(',').map((value) => value.trim());
@@ -12,19 +12,25 @@ export function convertColorFormat(color) {
   }
 
   return color;
-}
+};
 
-export function cleanFontFamily(fontFamily) {
-  return fontFamily.split(',')[0].replace(/['"]/g, '').trim();
-}
+export const formatRgba = (rgba) => {
+  if (rgba.a === 1) {
+    return `rgb(${Math.trunc(rgba.r)}, ${Math.trunc(rgba.g)}, ${Math.trunc(rgba.b)})`;
+  }
+  return `rgba(${Math.trunc(rgba.r)}, ${Math.trunc(rgba.g)}, ${Math.trunc(rgba.b)}, ${Math.trunc(rgba.a)})`;
+};
 
-export function toFixedTwo(value) {
+export const cleanFontFamily = (fontFamily) =>
+  fontFamily.split(',')[0].replace(/['"]/g, '').trim();
+
+export const toFixedTwo = (value) => {
   const numericValue = parseFloat(value);
 
   return Number.isNaN(numericValue) ? value : `${numericValue.toFixed(2)}px`;
-}
+};
 
-export function camelToKebabCase(string) {
+export const camelToKebabCase = (string) => {
   let result = '';
   for (let i = 0; i < string.length; i += 1) {
     const char = string[i];
@@ -35,7 +41,7 @@ export function camelToKebabCase(string) {
     }
   }
   return result;
-}
+};
 
 export const getNumericValue = (inputValue) => {
   const parsed = parseFloat(inputValue);

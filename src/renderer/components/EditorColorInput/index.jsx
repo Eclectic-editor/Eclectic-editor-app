@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ColorPicker, useColor } from 'react-color-palette';
 
-import { convertColorFormat } from '../../utils/styleUtils';
+import { convertColorFormat, formatRgba } from '../../utils/styleUtils';
 
 import 'react-color-palette/dist/css/rcp.css';
 import './style.scss';
@@ -9,8 +9,10 @@ import './style.scss';
 function EditorColorInput({ id, label, value, onChange }) {
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
   const [color, setColor] = useColor(convertColorFormat(value));
+  const [initialValue, setInitialValue] = useState(value);
 
   const handleClick = () => {
+    setInitialValue(color);
     setDisplayColorPicker(true);
   };
 
@@ -18,18 +20,16 @@ function EditorColorInput({ id, label, value, onChange }) {
     setDisplayColorPicker(false);
   };
 
-  const handleSubmit = () => {
-    const rgba = color.rgb;
-    let formattedColor;
-
-    if (rgba.a === 1) {
-      formattedColor = `rgb(${Math.trunc(rgba.r)}, ${Math.trunc(rgba.g)}, ${Math.trunc(rgba.b)})`;
-    } else {
-      formattedColor = `rgba(${Math.trunc(rgba.r)}, ${Math.trunc(rgba.g)}, ${Math.trunc(rgba.b)}, ${Math.trunc(rgba.a)})`;
-    }
-
+  const handleCancel = () => {
+    const formattedColor = formatRgba(initialValue.rgb);
     onChange(formattedColor);
     setDisplayColorPicker(false);
+  };
+
+  const handleColorChange = (newColor) => {
+    setColor(newColor);
+    const formattedColor = formatRgba(newColor.rgb);
+    onChange(formattedColor);
   };
 
   return (
@@ -56,14 +56,14 @@ function EditorColorInput({ id, label, value, onChange }) {
             <ColorPicker
               height={150}
               color={color}
-              onChange={setColor}
+              onChange={handleColorChange}
               hideInput={['hsv']}
             />
             <div className="popup-color-button">
-              <button type="button" onClick={handleClose}>
+              <button type="button" onClick={handleCancel}>
                 Cancel
               </button>
-              <button type="button" onClick={handleSubmit}>
+              <button type="button" onClick={handleClose}>
                 Submit
               </button>
             </div>
