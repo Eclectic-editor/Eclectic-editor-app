@@ -470,30 +470,6 @@ const createMultiViews = async () => {
   }, Promise.resolve());
 };
 
-const restoreDefaultViews = async () => {
-  if (multiViews.length > 0) {
-    await cleanUpViews(multiViews);
-    multiViews = [];
-  }
-
-  if (backgroundView) {
-    mainWindow.removeBrowserView(backgroundView);
-    backgroundView.webContents.destroy();
-    backgroundView = null;
-  }
-
-  mainWindow.addBrowserView(editorView);
-  mainWindow.addBrowserView(webPageView);
-
-  webPageView.webContents.setZoomFactor(1);
-  webPageView.setBounds({
-    x: 400,
-    y: 80,
-    width: mainWindow.getBounds().width - 400,
-    height: mainWindow.getBounds().height - 80,
-  });
-};
-
 const toggleTiltSingleView = () => {
   if (currentResolutionKey === 'desktop') {
     return;
@@ -503,8 +479,10 @@ const toggleTiltSingleView = () => {
   const currentBounds = webPageView.getBounds();
   const mainWindowBounds = mainWindow.getBounds();
   const resolution = customResolutions[currentResolutionKey];
+  let newWidth = resolution.width;
 
   if (isSingleModeTilted) {
+    newWidth = resolution.height;
     webPageView.setBounds({
       x: currentBounds.x,
       y: 80,
@@ -512,6 +490,7 @@ const toggleTiltSingleView = () => {
       height: mainWindowBounds.height - 80,
     });
   } else {
+    newWidth = resolution.width;
     webPageView.setBounds({
       x: currentBounds.x,
       y: 80,
@@ -519,6 +498,11 @@ const toggleTiltSingleView = () => {
       height: mainWindowBounds.height - 80,
     });
   }
+
+  resolutionView.webContents.send('update-resolution-label', {
+    ...customResolutions,
+    [currentResolutionKey]: { ...resolution, width: newWidth },
+  });
 };
 
 const toggleTiltMultiViews = async () => {
@@ -583,32 +567,35 @@ ipcMain.on('update-resolutions', (event, resolutions) => {
   }
 });
 
-ipcMain.on('setResolution', (event, resolutionKey) => {
+ipcMain.on('setResolution', async (event, resolutionKey) => {
   currentResolutionKey = resolutionKey;
   isMultiViewMode = false;
   isSingleModeTilted = false;
 
-  restoreDefaultViews();
-
-  if (resolutionKey === 'desktop') {
-    webPageView.setBounds({
-      x: 400,
-      y: 80,
-      width: mainWindow.getBounds().width - 400,
-      height: mainWindow.getBounds().height - 80,
-    });
-  } else {
-    const resolution = customResolutions[resolutionKey];
-
-    webPageView.setBounds({
-      x: 400,
-      y: 80,
-      width: resolution.width,
-      height: mainWindow.getBounds().height - 80,
-    });
+  if (multiViews.length > 0) {
+    await cleanUpViews(multiViews);
+    multiViews = [];
   }
 
+  if (backgroundView) {
+    mainWindow.removeBrowserView(backgroundView);
+    backgroundView.webContents.destroy();
+    backgroundView = null;
+  }
+
+  mainWindow.addBrowserView(editorView);
+  mainWindow.addBrowserView(webPageView);
+
+  const resolution = customResolutions[resolutionKey];
+  webPageView.setBounds({
+    x: 400,
+    y: 80,
+    width: resolution.width,
+    height: mainWindow.getBounds().height - 80,
+  });
+
   webPageView.webContents.setZoomFactor(1);
+  resolutionView.webContents.send('update-resolution-label', customResolutions);
 });
 
 const createWindow = () => {
