@@ -12,7 +12,7 @@ import './style.scss';
 function ResolutionSelector() {
   const [isMultiViewMode, setIsMultiViewMode] = useState(false);
   const [selectedResolution, setSelectedResolution] = useState('desktop');
-  const [resolutionLabel, setResolutionLabel] = useState('Desktop: 1280px');
+  const [resolutionLabel, setResolutionLabel] = useState('Desktop: 1380px');
 
   useEffect(() => {
     const handleResolutionUpdate = (resolutions) => {

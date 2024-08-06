@@ -6,7 +6,7 @@ function Modal() {
   const [resolutions, setResolutions] = useState({
     mobile: { width: 375, height: 812 },
     tablet: { width: 768, height: 1024 },
-    desktop: { width: 1280, height: 900 },
+    desktop: { width: 1380, height: 900 },
   });
   const [tempResolutions, setTempResolutions] = useState(resolutions);
   const [errors, setErrors] = useState({

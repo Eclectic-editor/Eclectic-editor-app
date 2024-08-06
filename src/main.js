@@ -32,7 +32,7 @@ let isTilted = false;
 let customResolutions = {
   mobile: { width: 375, height: 812 },
   tablet: { width: 768, height: 1024 },
-  desktop: { width: 1440, height: 900 },
+  desktop: { width: 1380, height: 900 },
 };
 
 const createModalLoading = () => {
@@ -245,11 +245,15 @@ const createBrowserViews = async (url) => {
     mainWindow.addBrowserView(webPageView);
     webPageView.setBackgroundColor('#ffffff');
     mainWindow.setTopBrowserView(webPageView);
+
+    const customWidth = customResolutions.desktop.width;
+    const contentHeight = mainWindow.getBounds().height - toolHeight;
+
     webPageView.setBounds({
       x: 400,
       y: toolHeight,
-      width: mainWindow.getBounds().width - 400,
-      height: mainWindow.getBounds().height - toolHeight,
+      width: customWidth,
+      height: contentHeight,
     });
     webPageView.webContents.loadURL(url);
 
@@ -565,6 +569,8 @@ ipcMain.on('update-resolutions', (event, resolutions) => {
 
     webPageView.webContents.setZoomFactor(1);
   }
+
+  resolutionView.webContents.send('update-resolution-label', customResolutions);
 });
 
 ipcMain.on('setResolution', async (event, resolutionKey) => {
@@ -616,10 +622,6 @@ const createWindow = () => {
     process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL ||
     `file://${path.join(__dirname, '../dist/renderer/index.html')}`;
   mainWindow.loadURL(startUrl);
-
-  if (process.env.NODE_ENV === 'development') {
-    mainWindow.webContents.openDevTools();
-  }
 };
 
 function setupIpcListeners() {
@@ -663,7 +665,7 @@ function setupIpcListeners() {
   });
 
   ipcMain.on('load-url', async (event, url) => {
-    await createModalLoading();
+    createModalLoading();
     await createBrowserViews(url);
   });
 
