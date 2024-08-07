@@ -1,4 +1,5 @@
 import { defineConfig, mergeConfig } from 'vite';
+import copy from 'rollup-plugin-copy';
 import {
   getBuildConfig,
   external,
@@ -7,19 +8,16 @@ import {
 
 // https://vitejs.dev/config
 export default defineConfig((env) => {
-  /** @type {import('vite').ConfigEnv<'build'>} */
   const forgeEnv = env;
   const { forgeConfigSelf } = forgeEnv;
-  /** @type {import('vite').UserConfig} */
   const config = {
     build: {
+      outDir: '.vite/build',
       rollupOptions: {
         external,
-        // Preload scripts may contain Web assets, so use the `build.rollupOptions.input` instead `build.lib.entry`.
         input: forgeConfigSelf.entry,
         output: {
           format: 'cjs',
-          // It should not be split chunks.
           inlineDynamicImports: true,
           entryFileNames: '[name].js',
           chunkFileNames: '[name].js',
@@ -27,7 +25,16 @@ export default defineConfig((env) => {
         },
       },
     },
-    plugins: [pluginHotRestart('reload')],
+    plugins: [
+      pluginHotRestart('reload'),
+      copy({
+        targets: [
+          { src: 'src/highlight.js', dest: '.vite/build' },
+          { src: 'src/utils/styleUtils.js', dest: '.vite/build/utils' },
+        ],
+        hook: 'writeBundle',
+      }),
+    ],
   };
 
   return mergeConfig(getBuildConfig(forgeEnv), config);

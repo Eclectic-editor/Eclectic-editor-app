@@ -1,4 +1,5 @@
 import { defineConfig, mergeConfig } from 'vite';
+import copy from 'rollup-plugin-copy';
 import {
   getBuildConfig,
   getBuildDefine,
@@ -8,12 +9,12 @@ import {
 
 // https://vitejs.dev/config
 export default defineConfig((env) => {
-  /** @type {import('vite').ConfigEnv<'build'>} */
   const forgeEnv = env;
   const { forgeConfigSelf } = forgeEnv;
   const define = getBuildDefine(forgeEnv);
   const config = {
     build: {
+      outDir: '.vite/build',
       lib: {
         entry: forgeConfigSelf.entry,
         fileName: () => '[name].js',
@@ -23,10 +24,18 @@ export default defineConfig((env) => {
         external,
       },
     },
-    plugins: [pluginHotRestart('restart')],
+    plugins: [
+      pluginHotRestart('restart'),
+      copy({
+        targets: [
+          { src: 'src/highlight.js', dest: '.vite/build' },
+          { src: 'src/utils/styleUtils.js', dest: '.vite/build/utils' },
+        ],
+        hook: 'writeBundle',
+      }),
+    ],
     define,
     resolve: {
-      // Load the Node.js entry.
       mainFields: ['module', 'jsnext:main', 'jsnext'],
     },
   };

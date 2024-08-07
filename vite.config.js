@@ -7,7 +7,7 @@ export default defineConfig({
     port: 3000,
   },
   build: {
-    outDir: 'dist/renderer',
+    outDir: '.vite/renderer/main_window',
     sourcemap: true,
   },
   resolve: {
