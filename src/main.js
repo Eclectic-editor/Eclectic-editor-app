@@ -34,19 +34,20 @@ let customResolutions = {
   tablet: { width: 768, height: 1024 },
   desktop: { width: 1380, height: 900 },
 };
-const preloadPath = app.isPackaged
-  ? path.join(__dirname, '.vite/build/preload.js')
-  : path.join(__dirname, 'preload.js');
 
-console.log('Preload path:', preloadPath);
+const isDevelopment = !app.isPackaged;
 
-const highlightPath = app.isPackaged
-  ? path.join(__dirname, '.vite/build/highlight.js')
-  : path.join(__dirname, 'highlight.js');
+const preloadPath = isDevelopment
+  ? path.join(app.getAppPath(), 'src/preload.js')
+  : path.join(app.getAppPath(), '.vite/build/preload.js');
 
-const styleUtilsPath = app.isPackaged
-  ? path.join(__dirname, '.vite/build/utils/styleUtils.js')
-  : path.join(__dirname, 'utils/styleUtils.js');
+const highlightPath = isDevelopment
+  ? path.join(app.getAppPath(), 'src/highlight.js')
+  : path.join(app.getAppPath(), '.vite/build/highlight.js');
+
+const styleUtilsPath = isDevelopment
+  ? path.join(app.getAppPath(), 'src/utils/styleUtils.js')
+  : path.join(app.getAppPath(), '.vite/build/utils/styleUtils.js');
 
 const createModalLoading = () => {
   child = new BrowserWindow({
@@ -58,8 +59,8 @@ const createModalLoading = () => {
   });
 
   const loadingUrl = process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL
-    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}/loading`
-    : `file://${path.join(__dirname, '.vite/renderer/main_window/index.html')}/loading`;
+    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}/#/loading`
+    : `file://${path.join(app.getAppPath(), '.vite/renderer/main_window/index.html')}/#/loading`;
 
   child.loadURL(loadingUrl);
 
@@ -90,8 +91,8 @@ const createModalView = () => {
   });
 
   const modalUrl = process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL
-    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}/modal`
-    : `file://${path.join(__dirname, '.vite/renderer/main_window/index.html')}/modal`;
+    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}/#/modal`
+    : `file://${path.join(app.getAppPath(), '.vite/renderer/main_window/index.html')}/#/modal`;
 
   const shadowHtml = `
     <style>
@@ -235,8 +236,8 @@ const createBrowserViews = async (url) => {
   });
 
   const editorUrl = process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL
-    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}/editor`
-    : `file://${path.join(__dirname, '.vite/renderer/main_window/index.html')}/editor`;
+    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}/#/editor`
+    : `file://${path.join(app.getAppPath(), '.vite/renderer/main_window/index.html')}/#/editor`;
 
   mainWindow.addBrowserView(resolutionView);
 
@@ -248,8 +249,8 @@ const createBrowserViews = async (url) => {
   });
 
   const resolutionUrl = process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL
-    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}/resolution`
-    : `file://${path.join(__dirname, '.vite/renderer/main_window/index.html')}/resolution`;
+    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}/#/resolution`
+    : `file://${path.join(app.getAppPath(), '.vite/renderer/main_window/index.html')}/#/resolution`;
 
   try {
     await editorView.webContents.loadURL(editorUrl);
@@ -281,6 +282,9 @@ const createBrowserViews = async (url) => {
   } catch (error) {
     console.error('Failed to load URL:', error);
   }
+
+  editorView.webContents.openDevTools();
+  resolutionView.webContents.openDevTools();
 };
 
 const applyStyles = async (view, editedStyle) => {
@@ -630,7 +634,8 @@ const createWindow = () => {
 
   const startUrl =
     process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL ||
-    `file://${path.join(__dirname, '.vite/renderer/main_window/index.html')}`;
+    `file://${path.join(app.getAppPath(), '.vite/renderer/main_window/index.html')}`;
+
   mainWindow.loadURL(startUrl);
 };
 

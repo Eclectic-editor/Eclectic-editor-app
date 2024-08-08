@@ -8,20 +8,8 @@ module.exports = {
   rebuildConfig: {},
   makers: [
     {
-      name: '@electron-forge/maker-squirrel',
-      config: {},
-    },
-    {
       name: '@electron-forge/maker-zip',
       platforms: ['darwin'],
-    },
-    {
-      name: '@electron-forge/maker-deb',
-      config: {},
-    },
-    {
-      name: '@electron-forge/maker-rpm',
-      config: {},
     },
   ],
   plugins: [
@@ -32,19 +20,16 @@ module.exports = {
           {
             entry: 'src/main.js',
             config: 'vite.main.config.mjs',
-            outDir: '.vite/build',
           },
           {
             entry: 'src/preload.js',
             config: 'vite.preload.config.mjs',
-            outDir: '.vite/build',
           },
         ],
         renderer: [
           {
             name: 'main_window',
             config: 'vite.renderer.config.mjs',
-            outDir: '.vite/renderer',
           },
         ],
       },

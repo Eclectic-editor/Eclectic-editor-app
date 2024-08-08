@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 
 import Home from './pages/Home';
 import Editor from './pages/Editor';
@@ -16,7 +16,7 @@ const root = createRoot(container);
 root.render(
   <Router>
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route exact path="/" element={<Home />} />
       <Route path="/editor" element={<Editor />} />
       <Route path="/resolution" element={<ResolutionSelector />} />
       <Route path="/modal" element={<Modal />} />
