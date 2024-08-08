@@ -343,12 +343,75 @@ for (let index = 0; index < viewConfigs.length; index++) {
 
 먼저, 요소별로 수정 내역을 저장할 수 있도록 Zustand 상태 관리를 설정했습니다. 상태는 `modifiedElements` 객체에 저장되며, 각 요소의 XPath를 키로 사용하여 수정된 영역과 속성을 저장합니다. 이를 통해 각 요소별로 수정 내역을 추적하고, UI에 뱃지 형태로 표시할 수 있게 되었습니다.
 
+```jsx
+// src/store/styleStore.js
+import { create } from 'zustand';
+
+const useStyleStore = create((set) => ({
+  modifiedElements: {},
+  addModification: (elementPath, area, property) =>
+    set((state) => {
+      const element = state.modifiedElements[elementPath] || {};
+      const areaModifications = element[area] || {};
+
+      return {
+        modifiedElements: {
+          ...state.modifiedElements,
+          [elementPath]: {
+            ...element,
+            [area]: {
+              ...areaModifications,
+              [property]: true,
+            },
+          },
+        },
+      };
+    }),
+  resetModifications: () => set({ modifiedElements: {} }),
+}));
+
+export default useStyleStore;
+```
+
+이후 `Editor` 컴포넌트에서는 선택한 요소와 수정 내역을 관리했습니다. 요소를 클릭하면 해당 요소의 XPath를 `selectedElement` 상태로 설정하고, 이를 통해 수정 내역을 가져왔습니다. 상태를 통해 각 요소의 수정 내역을 관리하고, UI에 반영하여 사용자가 쉽게 수정된 속성을 확인할 수 있도록 했습니다.
+
+```jsx
+// src/components/Editor.js
+import React, { useEffect, useState } from 'react';
+import useStyleStore from '../store/styleStore';
+
+const Editor = ({ selectedElement }) => {
+  const { modifiedElements, addModification } = useStyleStore();
+  const [elementPath, setElementPath] = useState('');
+
+  useEffect(() => {
+    if (selectedElement) {
+      const path = getXPath(selectedElement);
+      setElementPath(path);
+    }
+  }, [selectedElement]);
+
+  const getXPath = (element) => {
+    // xPath 계산 로직
+  };
+
+  const handleStyleChange = (area, property) => {
+    addModification(elementPath, area, property);
+  };
+
+  return (
+    <div>
+      {/* UI 요소들 */}
+      <FontArea onChange={handleStyleChange} />
+    </div>
+  );
+};
+
+export default Editor;
+```
+
+또한, `FontArea` 컴포넌트에서는 각 속성이 변경될 때마다 상태를 업데이트하고, 이를 통해 수정 내역을 관리했습니다. 상태 업데이트는 `addModification` 함수를 통해 이루어졌습니다. 또한, 수정된 속성의 제목(`EditorTitle`)에 `is-active` 클래스를 추가하여 스타일을 강조했습니다.
+
 <br>
 
 ## 💬 프로젝트 회고
-
-사용자 경험(UX)의 중요성을 다시 한 번 깨닫게 되었습니다. 사용자가 직관적으로 이해하고 사용할 수 있는 인터페이스를 제공하는 것이 얼마나 중요한지, 이를 위해 어떤 노력이 필요한지를 체감했습니다. 예를 들어, 수정된 스타일을 JSON 형식으로 저장하여 개발자들이 쉽게 이해하고 적용할 수 있도록 한 것은 작은 변화였지만, 큰 효율성을 가져왔습니다. 이처럼 사용자 중심의 기능 구현이 프로젝트의 성공에 큰 영향을 미친다는 것을 알게 되었습니다.
-
-마지막으로, 지속적인 학습과 성장이 필요하다는 것을 깨달았습니다. 새로운 문제를 해결하기 위해서는 끊임없이 학습하고, 최신 기술과 방법론을 습득해야 한다는 것을 실감했습니다. 프로젝트를 진행하며 다양한 기술을 익히고 적용해보면서, 기술적인 성장뿐만 아니라 문제 해결 능력도 함께 향상될 수 있었습니다.
-
-이번 프로젝트를 통해 많은 것을 배우고 성장할 수 있었으며, 이러한 경험을 바탕으로 앞으로 더 나은 프로젝트를 만들어 나가고자 합니다. 기술적인 깊이와 사용자 중심의 사고, 협업의 중요성, 지속적인 학습의 필요성을 체감한 소중한 시간이었습니다. 앞으로도 이러한 교훈을 바탕으로, 더욱 발전하는 개발자가 되도록 노력하겠습니다.
