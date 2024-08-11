@@ -29,8 +29,8 @@ export default defineConfig((env) => {
       pluginHotRestart('reload'),
       copy({
         targets: [
-          { src: 'src/highlight.js', dest: '.vite/build' },
-          { src: 'src/utils/styleUtils.js', dest: '.vite/build/utils' },
+          { src: 'src/main/highlight.js', dest: '.vite/build' },
+          { src: 'src/main/utils/styleUtils.js', dest: '.vite/build/utils' },
         ],
         hook: 'writeBundle',
       }),

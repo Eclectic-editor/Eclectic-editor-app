@@ -11,6 +11,16 @@ module.exports = {
       name: '@electron-forge/maker-zip',
       platforms: ['darwin'],
     },
+    {
+      name: '@electron-forge/maker-squirrel',
+      config: {
+        name: 'eclectic-editor',
+      },
+    },
+    {
+      name: '@electron-forge/maker-zip',
+      platforms: ['win32'],
+    },
   ],
   plugins: [
     {
@@ -18,11 +28,11 @@ module.exports = {
       config: {
         build: [
           {
-            entry: 'src/main.js',
+            entry: 'src/main/main.js',
             config: 'vite.main.config.mjs',
           },
           {
-            entry: 'src/preload.js',
+            entry: 'src/main/preload.js',
             config: 'vite.preload.config.mjs',
           },
         ],

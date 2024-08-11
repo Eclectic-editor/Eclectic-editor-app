@@ -38,15 +38,15 @@ let customResolutions = {
 const isDevelopment = !app.isPackaged;
 
 const preloadPath = isDevelopment
-  ? path.join(app.getAppPath(), 'src/preload.js')
+  ? path.join(app.getAppPath(), 'src/main/preload.js')
   : path.join(app.getAppPath(), '.vite/build/preload.js');
 
 const highlightPath = isDevelopment
-  ? path.join(app.getAppPath(), 'src/highlight.js')
+  ? path.join(app.getAppPath(), 'src/main/highlight.js')
   : path.join(app.getAppPath(), '.vite/build/highlight.js');
 
 const styleUtilsPath = isDevelopment
-  ? path.join(app.getAppPath(), 'src/utils/styleUtils.js')
+  ? path.join(app.getAppPath(), 'src/main/utils/styleUtils.js')
   : path.join(app.getAppPath(), '.vite/build/utils/styleUtils.js');
 
 const createModalLoading = () => {
@@ -59,8 +59,8 @@ const createModalLoading = () => {
   });
 
   const loadingUrl = process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL
-    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}/#/loading`
-    : `file://${path.join(app.getAppPath(), '.vite/renderer/main_window/index.html')}/#/loading`;
+    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}#/loading`
+    : `file://${path.join(app.getAppPath(), '.vite/renderer/main_window/index.html')}#/loading`;
 
   child.loadURL(loadingUrl);
 
@@ -91,8 +91,8 @@ const createModalView = () => {
   });
 
   const modalUrl = process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL
-    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}/#/modal`
-    : `file://${path.join(app.getAppPath(), '.vite/renderer/main_window/index.html')}/#/modal`;
+    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}#/modal`
+    : `file://${path.join(app.getAppPath(), '.vite/renderer/main_window/index.html')}#/modal`;
 
   const shadowHtml = `
     <style>
@@ -236,8 +236,8 @@ const createBrowserViews = async (url) => {
   });
 
   const editorUrl = process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL
-    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}/#/editor`
-    : `file://${path.join(app.getAppPath(), '.vite/renderer/main_window/index.html')}/#/editor`;
+    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}#/editor`
+    : `file://${path.join(app.getAppPath(), '.vite/renderer/main_window/index.html')}#/editor`;
 
   mainWindow.addBrowserView(resolutionView);
 
@@ -249,8 +249,8 @@ const createBrowserViews = async (url) => {
   });
 
   const resolutionUrl = process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL
-    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}/#/resolution`
-    : `file://${path.join(app.getAppPath(), '.vite/renderer/main_window/index.html')}/#/resolution`;
+    ? `${process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL}#/resolution`
+    : `file://${path.join(app.getAppPath(), '.vite/renderer/main_window/index.html')}#/resolution`;
 
   try {
     await editorView.webContents.loadURL(editorUrl);
@@ -282,9 +282,6 @@ const createBrowserViews = async (url) => {
   } catch (error) {
     console.error('Failed to load URL:', error);
   }
-
-  editorView.webContents.openDevTools();
-  resolutionView.webContents.openDevTools();
 };
 
 const applyStyles = async (view, editedStyle) => {
