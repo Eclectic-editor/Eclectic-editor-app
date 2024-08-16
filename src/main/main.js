@@ -1,3 +1,5 @@
+import { initAnalytics, sendEvent } from './utils/analytics';
+
 const {
   app,
   BrowserWindow,
@@ -677,6 +679,7 @@ function setupIpcListeners() {
   });
 
   ipcMain.on('load-url', async (event, url) => {
+    sendEvent('page_view', { page_title: url });
     createModalLoading();
     await createBrowserViews(url);
   });
@@ -808,8 +811,10 @@ function setupIpcListeners() {
 }
 
 app.whenReady().then(() => {
+  initAnalytics();
   setupIpcListeners();
   createWindow();
+  sendEvent('app_start');
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -819,6 +824,8 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
+  sendEvent('app_close');
+
   if (require('electron-squirrel-startup')) {
     app.quit();
   }
