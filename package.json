@@ -4,6 +4,10 @@
   "version": "0.2.0",
   "description": "My Electron application description",
   "main": ".vite/build/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Eclectic-editor/Eclectic-editor-app.git"
+  },
   "scripts": {
     "start": "electron-forge start",
     "build": "vite build",
@@ -32,6 +36,7 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
     "@electron-forge/plugin-fuses": "^7.4.0",
     "@electron-forge/plugin-vite": "^7.4.0",
+    "@electron-forge/publisher-github": "^7.4.0",
     "@electron/fuses": "^1.8.0",
     "@eslint/js": "^9.7.0",
     "@testing-library/dom": "^10.4.0",
@@ -40,6 +45,7 @@
     "@vitejs/plugin-react": "^4.3.1",
     "@vitest/coverage-v8": "^2.0.5",
     "babel-jest": "^29.7.0",
+    "dotenv": "^16.4.5",
     "electron": "31.2.0",
     "eslint": "^8.57.0",
     "eslint-config-airbnb": "^19.0.4",
