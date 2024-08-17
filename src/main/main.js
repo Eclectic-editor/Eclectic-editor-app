@@ -629,6 +629,7 @@ const createWindow = () => {
     },
     fullscreen: true,
     backgroundColor: '#303030',
+    icon: path.join(__dirname, '../../assets/icon.png'),
   });
 
   const startUrl =
