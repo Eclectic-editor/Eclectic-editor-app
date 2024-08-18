@@ -1,20 +1,19 @@
 <div align=center>
+<br>
 
-# EclecticEditor
-
-<img width="800" alt="Notion Cover" src="https://github.com/user-attachments/assets/a21f95c5-4222-4ae5-8dc9-7184013330c4">
-
-Eclectic Editor는 Electron으로 개발된 <b>CSS 편집기</b>로, 사용자가 원하는 URL을 입력하면 해당 웹사이트의 CSS를 <b>직관적으로 편집할 수 있는 도구</b>입니다. 사용자는 웹 페이지의 요소를 클릭하여 <b>실시간으로 스타일을 변경</b>하고, <b>다양한 해상도</b>에서의 변화를 즉시 확인할 수 있습니다. 수정된 스타일은 JSON 파일로 저장할 수 있어 개발자에게 쉽게 전달할 수 있으며, 이를 통해 협업과 의사소통이 원활해집니다.
+<img width="151" alt="logo" src="https://github.com/user-attachments/assets/ac69aff0-204f-40c7-ac8f-084ac46064e6">
 
 <br>
 
-## 🔗 Links
+# Eclectic Editor
 
-배포 오류가 있어 수정 후 압축 파일 제공 예정
+Eclectic Editor는 Electron으로 개발된 <b>CSS 편집기</b>입니다. <br> 사용자가 원하는 URL을 입력하면 해당 웹사이트의 CSS를 직관적으로 편집할 수 있습니다. <br> 수정된 스타일은 JSON 파일로 저장할 수 있어 개발자에게 쉽게 전달할 수 있으며, <br>이를 통해 협업과 의사소통이 원활해집니다.
 
 <br>
 
-## 🔧 기술 스택
+<a href="https://github.com/Eclectic-editor/Eclectic-editor-app/releases/download/v1.0.0/eclectic-editor-darwin-x64-1.0.0.zip">Download Eclectic Editor</a>
+
+<br>
 
 <img src="https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=black">
 <img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">
@@ -23,267 +22,202 @@ Eclectic Editor는 Electron으로 개발된 <b>CSS 편집기</b>로, 사용자�
 <img src="https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white">
 <img src="https://img.shields.io/badge/zustand-8A385D?style=for-the-badge">
 <img src="https://img.shields.io/badge/Sass-CC6699?style=for-the-badge&logo=sass&logoColor=white">
+<img src="https://img.shields.io/badge/vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white">
 
 <br>
 
 </div>
 
-<br>
+<br><br>
 
-## 🗂️ 목차
+# Contents
 
-- [**🎨 EclecticEditor**](#EclecticEditor)
-- [**🔗 Links**](#Links)
-- [**💡 기획 동기**](#기획-동기)
-- [**🔧 기술 스택**](#기술-스택)
-- [**🔎 기능 설명**](#기능-설명)
-- [**☄️ 기술 챌린지**](#기술-챌린지)
-- [**💬 프로젝트 회고**](#프로젝트-회고)
+- [**Eclectic Editor ?**](#eclectic-editor-1)
+- [**Features**](#features)
+- [**Developmoent Focus**](#development-focus)
+- [**Project Insights**](#project-insights)
 
-<br>
+<br><br>
 
-## 💡 기획 동기
+# Eclectic Editor ?
 
-웹 개발 과정에서 디자인 변경과 스타일 수정은 자주 발생하는 작업입니다. 특히 프로젝트의 후반부나 유지보수 단계에서 클라이언트나 팀 내부에서 디자인 변경 요청이 들어올 때가 많습니다. 이런 상황에서 개발자나 퍼블리셔가 직접 코드를 수정하는 것은 시간과 비용 면에서 비효율적입니다.
-
-예를 들어, 클라이언트가 급하게 특정 페이지의 색상이나 폰트 크기를 변경해달라고 요청하는 경우가 있습니다. 또는 A/B 테스트를 위해 여러 버전의 디자인을 빠르게 적용해보고 싶은 상황도 있습니다. 이런 경우, 개발 일정에 영향을 주지 않으면서도 신속하게 변경사항을 적용하고 확인할 수 있는 도구가 필요했습니다.
+웹 개발 과정에서 디자인 변경과 스타일 수정은 자주 발생하는 작업입니다. 예를 들어, A/B 테스트를 위해 여러 버전의 디자인을 빠르게 적용해보고 싶은 상황도 있습니다. 이런 경우, 개발 일정에 영향을 주지 않으면서도 신속하게 변경사항을 적용하고 확인할 수 있는 도구가 필요했습니다.
 
 또한, 디자이너와 개발자 사이의 의사소통을 개선할 필요도 자주 느꼈습니다. 디자이너가 원하는 정확한 스타일을 개발자에게 전달하는 과정에서 오해가 생기거나 시간이 지체되는 경우가 많았습니다. 직접 스타일을 조정하고 그 결과를 즉시 확인할 수 있는 도구가 있다면 이러한 의사소통의 문제를 줄일 수 있을 것이라고 생각했습니다.
 
-이런 생각을 하다 보니, **"개발 지식이 없는 사람들도 웹페이지의 스타일을 쉽게 수정할 수 있다면 어떨까?"** 라는 의문이 들었습니다. 이 질문은 실제 업무 현장에서 겪었던 문제들에 대한 해결책을 찾게 했습니다. 디자이너, 마케터, 기획자 등 다양한 팀 구성원들이 직접 웹페이지를 수정할 수 있다면 많은 이점을 제공할 것이라 생각합니다.
+이런 생각을 하다 보니, **"개발 지식이 없는 사람들도 웹페이지의 스타일을 쉽게 수정할 수 있다면 어떨까?"** 라는 의문이 들었습니다.
 
-이런 아이디어를 바탕으로 Eclectic Editor 프로젝트를 기획하게 되었습니다.
+이에 사용자가 URL만 입력하면 해당 웹사이트의 CSS를 직관적으로 편집할 수 있는 서비스를 기획하게 되었습니다. 이 도구를 통해 디자인 변경 프로세스를 간소화하고, 개발자-디자이너 간 협업을 개선하며, 궁극적으로 웹 개발의 효율성을 높이는 것이 목표입니다.
 
-<br>
+<br><br>
 
-## 🔎 기능 설명
+# Features
 
-### 1. URL 입력 시 해당 웹사이트로 이동
+## 1. URL 입력 시 해당 웹사이트와 CSS 편집 화면으로 이동
+
+---
 
 <details>
 <summary>
-  📺 미리보기
+  URL 입력
 </summary>
   <br>
-  <img alt="url입력" src="https://github.com/user-attachments/assets/1412e68f-30aa-4cff-9e91-b000192f041b"/>
+  <img alt="url입력" src="https://github.com/user-attachments/assets/1412e68f-30aa-4cff-9e91-b000192f041b">
 </details>
-URL을 입력하면 해당 웹사이트와 CSS 편집기 화면으로 넘어갑니다.
 
-<br>
+<br><br>
 
-### 2. CSS 편집
+## 2. CSS 편집
 
-#### 2-1. Font
+---
 
 <details>
 <summary>
-  📺 미리보기
+  Font 편집
 </summary>
   <br>
-  <img alt="css_font" src="https://github.com/user-attachments/assets/3c4ab331-2f39-40ab-917f-77ad3cc891c1"/>
+  <img alt="css_font" src="https://github.com/user-attachments/assets/3c4ab331-2f39-40ab-917f-77ad3cc891c1">
+  <p>font-family, color, font-size, line-height, font-weight, <br>
+font-style, font-variant, text-decoration의 스타일을 수정할 수 있습니다.</p>
 </details>
-font-family, color, font-size, line-height, font-weight, <br>
-font-style, font-variant, text-decoration의 스타일을 수정할 수 있습니다.
 
 <br>
 
-#### 2-2. Text
-
 <details>
 <summary>
-  📺 미리보기
+  Text 편집
 </summary>
   <br>
   <img alt="css_text" src="https://github.com/user-attachments/assets/aaad7f94-d935-4f23-8d38-c89074c28af4"/>
+<p>text-align, text-indent, text-transform, word-spacing, <br>
+letter-spacing, word-wrap, white-space, vertical-align의 스타일을 수정할 수 있습니다.</p>
 </details>
-text-align, text-indent, text-transform, word-spacing, <br>
-letter-spacing, word-wrap, white-space, vertical-align의 스타일을 수정할 수 있습니다.
 
 <br>
 
-#### 2-3. Background
-
 <details>
 <summary>
-  📺 미리보기
+  Background 편집
 </summary>
   <br>
   <img alt="css_background" src="https://github.com/user-attachments/assets/5f81cb3a-d80c-451d-8881-b60d6d6d40f4"/>
+<p>background-color, background-image, background-position, <br>
+background-size, background-blendmode, background-attachment의 스타일을 수정할 수 있습니다.</p>
 </details>
-background-color, background-image, background-position, <br>
-background-size, background-blendmode, background-attachment의 스타일을 수정할 수 있습니다.
 
 <br>
 
-#### 2-4. Dimensions
-
 <details>
 <summary>
-  📺 미리보기
+  Dimensions 편집
 </summary>
   <br>
   <img alt="css_dimensions" src="https://github.com/user-attachments/assets/f466261e-ada2-43ab-902a-659be93b03e8"/>
+<p>width, height, max-width, max-height, <br>
+min-width, min-height의 스타일을 수정할 수 있습니다.</p>
 </details>
-width, height, max-width, max-height, <br>
-min-width, min-height의 스타일을 수정할 수 있습니다.
 
 <br>
 
-#### 2-5. Spacing
-
 <details>
 <summary>
-  📺 미리보기
+  Spacing 편집
 </summary>
   <br>
   <img alt="css_spacing" src="https://github.com/user-attachments/assets/916fd91a-001c-4b60-aec4-f9e6d32b86fa"/>
+<p>padding, margin의 스타일을 수정할 수 있습니다.</p>
 </details>
-padding, margin의 스타일을 수정할 수 있습니다.
 
 <br>
 
-#### 2-6. Border
-
 <details>
 <summary>
-  📺 미리보기
+  Border 편집
 </summary>
   <br>
   <img alt="css_border" src="https://github.com/user-attachments/assets/71af9549-788c-41f0-b14f-4c4bfc83dfda"/>
+<p>border-width, border-color, border-color, border-radius의 스타일을 수정할 수 있습니다.</p>
 </details>
-border-width, border-color, border-color, border-radius의 스타일을 수정할 수 있습니다.
 
-<br>
+<br><br>
 
-### 3. 해상도 선택
+## 3. 해상도 선택
 
-#### 3-1. 단일 모드
+---
 
 <details>
 <summary>
-  📺 미리보기
+  단일 모드
 </summary>
   <br>
   <img alt="single_mode" src="https://github.com/user-attachments/assets/5acd4072-9eaf-4e5b-8688-b135fc06a06e"/>
+<ul>
+  <li>모바일, 태블릿, 데스크탑의 단일 화면을 선택 및 스타일 수정을 할 수 있습니다.</li>
+  <li>가로/세로 전환 모드가 가능합니다.</li>
+  <li>원하는 크기로 설정이 가능합니다.</li>
+</ul>
 </details>
-모바일, 태블릿, 데스크탑의 단일 화면을 선택 및 스타일 수정을 할 수 있습니다.
-가로/세로 전환 모드가 가능합니다.
-원하는 크기로 설정이 가능합니다.
 
 <br>
 
-#### 3-2. 멀티 모드
-
 <details>
 <summary>
-  📺 미리보기
+  멀티 모드
 </summary>
   <br>
   <img alt="multi_mode" src="https://github.com/user-attachments/assets/6f8988d1-64c6-43e4-821e-111c4cf724bd"/>
+<ul>
+  <li>모바일, 태블릿, 데스크탑을 한 화면으로 확인할 수 있습니다.</li>
+  <li>모든 해상도의 스크롤이 동기화 됩니다.</li>
+  <li>가로/세로 전환 모드가 가능합니다.</li>
+  <li>원하는 크기로 설정이 가능합니다.</li>
+</ul>
 </details>
-모바일, 태블릿, 데스크탑을 한 화면으로 확인할 수 있습니다.
-모든 해상도의 스크롤이 동기화 됩니다.
-가로/세로 전환 모드가 가능합니다.
-원하는 크기로 설정이 가능합니다.
 
-<br>
+<br><br>
 
-### 4. 수정된 스타일 JSON 파일로 저장
+## 4. 수정된 스타일 JSON 파일로 저장
+
+---
 
 <details>
 <summary>
-  📺 미리보기
+  JSON 파일 저장
 </summary>
   <br>
   <img alt="json_save" src="https://github.com/user-attachments/assets/f02fada7-c2e7-40f6-a0e9-292ca97b639d"/>
+<p>xPath와 변경된 스타일을 json 파일로 확인할 수 있습니다.</p>
 </details>
-xPath와 변경된 스타일을 json 파일로 확인할 수 있습니다.
 
-<br>
+<br><br>
 
-## ☄️ 기술 챌린지
+# Development Focus
 
 ## 1. 웹 페이지와 데스크톱 애플리케이션 간의 스타일 수정, 어떻게 가능할까?
+
+---
 
 ### 1-1. 웹 페이지와 데스크톱 애플리케이션 간의 통신 구현 방법은?
 
 Eclectic Editor에서는 사용자가 웹 페이지의 요소를 클릭하고, 이를 편집하는 기능을 제공합니다. EditorView는 사용자가 요소의 스타일을 변경할 수 있는 인터페이스를 제공하고, WebpageView는 실제 웹 페이지를 표시합니다. 이 두 뷰는 서로 독립적인 렌더러 프로세스로 동작하기 때문에, 직접적인 데이터 교환이 불가능하여 요소 클릭 정보를 EditorView로 전달하는 과정이 필요했습니다.
 
-![Group 24](https://github.com/user-attachments/assets/7f736fd1-8233-4b01-b4e0-04c77f2634f1)
+<img src="https://github.com/user-attachments/assets/7f736fd1-8233-4b01-b4e0-04c77f2634f1" width="600"/>
 
-이 문제를 해결하기 위해 우리는 Electron의 IPC(Inter-Process Communication) 메커니즘을 활용했습니다. 아래 이미지에서 볼 수 있듯이, 통신 과정은 다음과 같은 순서로 이루어집니다.
+이 문제를 해결하기 위해 Electron의 IPC(Inter-Process Communication) 메커니즘을 활용했습니다.
+IPC는 서로 다른 프로세스 간에 데이터를 안전하게 주고받을 수 있게 해주는 시스템입니다.
 
-![Group 27](https://github.com/user-attachments/assets/27d25177-bc72-4172-8652-fc3d97f25312)
-
-<br>
-
-**WebpageView에서 클릭된 요소의 정보 수집**
-
-- 사용자가 웹 페이지에서 특정 요소를 클릭하면 해당 요소의 정보가 수집됩니다.
-
-```jsx
-document.body.addEventListener('click', async (event) => {
-  event.preventDefault();
-  event.stopPropagation();
-  const elementInfo = {
-    tagName: event.target.tagName,
-    classList: Array.from(event.target.classList),
-    id: event.target.id,
-    outerHTML: event.target.outerHTML,
-    zippy:
-      event.target.dataset.zippy || (await window.electronAPI.generateUUID()),
-  };
-  window.electronAPI.elementClicked(elementInfo);
-});
-```
+<img src="https://github.com/user-attachments/assets/27d25177-bc72-4172-8652-fc3d97f25312" width="600"/>
 
 <br>
 
-**preload.js를 통해 메인 프로세스(ipcMain)로 정보 전달**
+구체적인 구현 과정은 다음과 같습니다.
 
-- `preload.js`에서 `ipcRenderer`를 통해 정보를 메인 프로세스로 전달합니다.
+1. `WebpageView`에서 요소 정보 수집: 사용자가 웹페이지에서 요소를 클릭하면, 해당 요소의 태그명, 클래스, ID 등의 정보를 수집합니다.
+2. `preload.js`를 통한 정보 전달: 수집된 정보는 preload.js에서 ipcRenderer를 통해 메인 프로세스로 전달됩니다. 이 과정에서 contextBridge를 사용하여 보안을 강화했습니다.
+3. 메인 프로세스에서 정보 처리: 메인 프로세스(main.js)에서는 전달받은 정보를 EditorView로 다시 전송합니다.
+4. `EditorView`에서 정보 수신 및 처리: 마지막으로, EditorView에서 이 정보를 받아 상태를 업데이트하고 UI를 갱신합니다.
 
-```jsx
-contextBridge.exposeInMainWorld('electronAPI', {
-  elementClicked: (data) => ipcRenderer.send('element-clicked', data),
-  generateUUID: async () => {
-    const { v4: uuidv4 } = await import('uuid');
-    return uuidv4();
-  },
-});
-```
-
-<br>
-
-**메인 프로세스(main.js)에서 정보 수신 및 EditorView로 전달**
-
-- 메인 프로세스에서 정보를 수신하고, `EditorView`로 전달합니다.
-
-```jsx
-ipcMain.on('element-clicked', (event, elementInfo) => {
-  editorView.webContents.send('element-info', elementInfo);
-});
-```
-
-<br>
-
-**EditorView에서 정보 수신 및 처리:**
-
-- `EditorView`에서 정보를 수신하고, 상태를 업데이트합니다.
-
-```jsx
-useEffect(() => {
-  const handleElementClicked = (event, elementInfo) => {
-    setSelectedElement(elementInfo);
-  };
-  window.electronAPI.receive('element-info', handleElementClicked);
-  return () => {
-    window.electronAPI.removeListener('element-info', handleElementClicked);
-  };
-}, []);
-```
-
-이러한 접근 방식을 통해 WebpageView에서 선택된 요소의 정보를 EditorView로 안전하게 전달할 수 있게 되었습니다.
+이러한 접근 방식을 통해 웹페이지와 데스크톱 앱 사이의 안전하고 효율적인 통신 채널을 구축할 수 있었습니다.
 
 <br>
 
@@ -291,13 +225,24 @@ useEffect(() => {
 
 처음에는 클릭된 요소를 클래스와 텍스트 이름으로 식별하려고 했습니다. 그러나 이 방법은 요소가 중복될 가능성이 크다는 문제점이 있었습니다. 예를 들어, 동일한 클래스명을 가진 여러 요소가 있는 경우 정확히 어느 요소가 클릭되었는지 식별하는 데 어려움이 있었습니다.
 
-이 문제를 해결하기 위해 클릭한 요소에 대해 UUID(Universally Unique Identifier)를 사용하기로 결정했습니다. UUID는 고유성을 보장하므로 각 요소에 고유한 식별자를 부여할 수 있습니다.
+<img src="https://github.com/user-attachments/assets/9d8d606b-d105-4198-8b2e-619ea0d57cb8" width="600"/>
 
-[[코드 추가 예정]]
+이 문제를 해결하기 위해 UUID(Universally Unique Identifier)를 도입했습니다. 아래의 특징이 있어 각 요소에 고유한 식별자를 부여할 수 있습니다.
+
+> UUID는 각 요소에 고유한 식별자를 부여할 수 있는 128비트의 숫자입니다.
+
+- 고유성: 중복 가능성이 낮습니다.
+- 범용성: 다양한 환경에서 독립적으로 생성 가능합니다.
+
+<img src="https://github.com/user-attachments/assets/0c50a507-9cd4-4560-99c6-431bcd53aa47" width="600"/>
+
+이 접근 방식은 단일 뷰에서 요소를 식별하는 데 효과적이었습니다. 하지만 여러 해상도의 뷰를 동시에 다루는 과정에서 새로운 문제가 발생했고, 이는 다음 섹션에서 다루겠습니다.
 
 <br>
 
 ## 2. 모바일, 태블릿, 데스크탑을 한 화면에 출력되게 하려면?
+
+---
 
 ### 2-1. UUID 대신 xPath를 사용해 요소를 어떻게 식별할까?
 
@@ -305,113 +250,104 @@ useEffect(() => {
 
 초기 구현에서는 각 요소에 UUID를 부여하여 식별했습니다. 예를 들어, 사용자가 모바일 뷰에서 특정 요소를 클릭하여 스타일을 변경하면 해당 요소에 UUID가 부여됩니다. 그러나 이 방식에는 문제가 있었습니다. UUID는 각 요소에 고유하게 부여되기 때문에, 동일한 요소를 다른 WebpageView에서 식별하는 것이 어려웠습니다. 예를 들어, 모바일 뷰에서 특정 요소를 클릭하여 스타일을 변경한 후, 동일한 스타일을 태블릿이나 데스크탑 뷰에서도 적용하려고 할 때, 해당 요소를 정확히 식별할 수 없었습니다. 따라서 동일한 스타일을 다른 뷰에 일관되게 적용하기 위해서는 다른 방법이 필요했습니다.
 
+<img src="https://github.com/user-attachments/assets/070973da-10ae-49d0-a2c2-30ee057764ec" width="600"/>
+
 이 문제를 해결하기 위해 UUID 대신 xPath를 사용하기로 결정했습니다. xPath는 요소의 위치를 명확하게 지정할 수 있기 때문에, 동일한 요소를 여러 뷰에서 일관되게 식별할 수 있습니다. 이를 통해 요소의 정확한 위치를 식별할 수 있게 되었고, 각 뷰에서 동일한 스타일을 적용할 수 있었습니다.
+
+> xPath(XML Path Language)는 XML 문서의 특정 요소나 속성을 찾기 위한 쿼리 언어로, HTML 문서에서도 사용할 수 있습니다.
+
+<img src="https://github.com/user-attachments/assets/351dd9b5-b8b4-402f-83c1-3719bdcf10e3" width="600"/>
 
 <br>
 
-### 2-2. 여러 해상도의 뷰 간 스크롤을 어떻게 동기화할까?
+### 2-2. 다중 해상도 뷰에서 비동기적 스크롤 동기화를 어떻게 구현할까?
 
-여러 해상도의 웹페이지 미리보기를 제공하면서, 각 해상도별 뷰 간의 스크롤 동기화 기능이 간헐적으로 작동하지 않는 문제가 발생했습니다. 특정 해상도에서만 동기화되거나 동기화가 되지 않는 경우가 발생하였으며, 스크롤한 해당 뷰의 콘솔 로그는 정상적으로 출력되었지만, 다른 뷰에서는 동기화 이벤트가 발생하지 않았습니다.
+멀티뷰 모드에서 여러 해상도의 웹페이지를 동시에 표시할 때, 뷰 간 스크롤 동기화에 문제가 발생했습니다. 주요 이슈는 다음과 같았습니다
 
-이 문제의 근본 원인은 뷰들이 동시에 생성되면서 실행 순서가 보장되지 않아 동기화 상태가 일관되지 않았다는 점이었습니다. 초기 코드에서는 `viewConfigs.map`과 `Promise.all`을 사용하여 뷰를 생성하고 초기화하는 방식을 사용했는데, 이로 인해 뷰들이 동시에 생성되면서 각 뷰의 생성 및 초기화 순서가 보장되지 않았습니다.
+- 특정 해상도에서만 스크롤이 동기화되는 현상
+- 일부 뷰에서 동기화 이벤트가 발생하지 않는 문제
+- 콘솔 로그는 정상 출력되지만 실제 동기화가 이루어지지 않는 상황
 
-```jsx
+문제의 근본 원인은 뷰 생성 및 초기화 과정의 비동기적 특성에 있었습니다. 초기 구현에서는 Promise.all을 사용하여 모든 뷰를 동시에 생성하고 초기화했습니다:
+
+```js
 const viewPromises = viewConfigs.map(async (config, index) => {
-  // 비동기 작업
+  // 비동기 뷰 생성 및 초기화 로직
 });
 await Promise.all(viewPromises);
 ```
 
-위 코드에서는 모든 비동기 작업이 동시에 실행되므로, 어떤 뷰가 먼저 생성되고 초기화될지 알 수 없었습니다. 이로 인해 동기화 문제가 발생할 수 있었습니다.
+이 방식은 성능 면에서는 효율적일 수 있지만, 각 뷰의 생성과 초기화 순서가 보장되지 않아 동기화 상태의 일관성 문제를 야기했습니다.
 
-해결 방법으로는 `for` 루프와 `await`를 사용하여 각 뷰를 순서대로 생성하고 초기화하는 방식을 선택했습니다. 이렇게 하면 모든 뷰가 순서대로 생성되고 초기화되므로, 동기화 문제가 해결될 수 있습니다.
+이 문제를 해결하기 위해, 순차적인 뷰 생성 및 초기화 방식을 도입했습니다.
 
-```jsx
+```js
 for (let index = 0; index < viewConfigs.length; index++) {
   const config = viewConfigs[index];
-  // 비동기 작업
+
+  await createAndInitializeView(config, index, url);
 }
 ```
 
-이 방식에서는 각 비동기 작업을 순서대로 실행하여, 실행 순서가 보장됩니다. 즉, 각 뷰가 순서대로 생성되고 초기화되므로, 동기화 문제가 발생하지 않습니다.
+이 접근 방식의 주요 이점은 다음과 같습니다.
+
+- 뷰 생성 순서 보장: 각 뷰가 순차적으로 생성되어 초기화 순서가 명확해집니다.
+- 상태 일관성 향상: 이전 뷰의 초기화가 완료된 후 다음 뷰가 생성되므로, 동기화 상태의 일관성이 개선됩니다.
+- 에러 처리 용이성: 각 뷰의 생성 및 초기화 과정에서 발생하는 문제를 개별적으로 처리할 수 있습니다.
+
+이러한 변경으로 스크롤 동기화의 안정성이 향상되었습니다.
+
+추가적으로, 스크롤 이벤트 처리와 뷰 간 통신을 최적화하기 위해 다음과 같은 기술을 적용했습니다.
+
+- 디바운싱: 과도한 스크롤 이벤트 발생을 방지하기 위해 스크롤 이벤트에 디바운스 기법을 적용했습니다.
+- 정규화된 스크롤 위치: 각 뷰의 크기 차이를 고려하여 스크롤 위치를 정규화된 값(0~1 사이)으로 전달했습니다.
+
+이러한 최적화 기법들을 통해 다중 해상도 환경에서의 스크롤 동기화 문제를 효과적으로 해결할 수 있었습니다. 결과적으로 사용자는 어떤 해상도의 뷰를 조작하더라도 모든 뷰에서 일관된 스크롤 경험을 얻을 수 있게 되었습니다.
 
 <br>
 
 ## 3. 선택한 요소의 수정한 속성을 기억할 순 없을까?
 
-웹 페이지의 요소를 선택하고 스타일을 수정할 때, 수정된 내역을 추적하고 이를 UI에 반영하여 수정된 속성을 강조하는 기능이 필요하다고 느꼈습니다. 이를 통해 사용자는 자신이 수정한 내용을 쉽게 파악할 수 있고, 동일한 속성을 여러 번 변경하더라도 일관성 있게 관리할 수 있습니다. 이 기능은 초기 칸반 태스크에는 없었지만, 사용성을 고려해 추가하게 되었습니다.
+---
 
-먼저, 요소별로 수정 내역을 저장할 수 있도록 Zustand 상태 관리를 설정했습니다. 상태는 `modifiedElements` 객체에 저장되며, 각 요소의 XPath를 키로 사용하여 수정된 영역과 속성을 저장합니다. 이를 통해 각 요소별로 수정 내역을 추적하고, UI에 뱃지 형태로 표시할 수 있게 되었습니다.
+프로젝트를 개발하면서 웹 페이지 요소의 스타일을 수정하는 기본 기능은 잘 작동했지만, 뭔가 부족하다는 느낌이 들었습니다. 직접 테스트를 해보니, 여러 요소를 수정하다 보면 어떤 부분을 변경했는지 헷갈리기 시작했습니다. 이는 사용자도 비슷한 어려움을 겪을 수 있다는 것을 의미했습니다.
+이 문제를 해결하기 위해 두 가지 핵심 사항에 집중했습니다.
 
-```jsx
-// src/store/styleStore.js
-import { create } from 'zustand';
+- 수정한 요소와 속성을 눈에 띄게 표시하기
+- 변경 사항을 한눈에 볼 수 있게 만들기
 
-const useStyleStore = create((set) => ({
-  modifiedElements: {},
-  addModification: (elementPath, area, property) =>
-    set((state) => {
-      const element = state.modifiedElements[elementPath] || {};
-      const areaModifications = element[area] || {};
+이를 위해 수정 내역을 추적하고 UI에 반영하는 기능을 추가하기로 했습니다. 이렇게 하면 다음과 같은 장점이 있을 거라고 생각했습니다.
 
-      return {
-        modifiedElements: {
-          ...state.modifiedElements,
-          [elementPath]: {
-            ...element,
-            [area]: {
-              ...areaModifications,
-              [property]: true,
-            },
-          },
-        },
-      };
-    }),
-  resetModifications: () => set({ modifiedElements: {} }),
-}));
+- 사용자가 수정한 내용을 바로 확인할 수 있음
+- 어떤 요소와 속성을 변경했는지 명확히 알 수 있어 혼란을 줄일 수 있음
 
-export default useStyleStore;
-```
+처음에는 이 기능을 생각하지 못했지만, 개발하면서 사용자 입장에서 생각해보니 꼭 필요한 기능이라고 판단했습니다. 사용자가 편리하게 사용할 수 있는 툴을 만드는 것이 중요하다고 생각했기 때문에 계획에 없었지만 이 기능을 추가하기로 결정했습니다.
 
-이후 `Editor` 컴포넌트에서는 선택한 요소와 수정 내역을 관리했습니다. 요소를 클릭하면 해당 요소의 XPath를 `selectedElement` 상태로 설정하고, 이를 통해 수정 내역을 가져왔습니다. 상태를 통해 각 요소의 수정 내역을 관리하고, UI에 반영하여 사용자가 쉽게 수정된 속성을 확인할 수 있도록 했습니다.
-
-```jsx
-// src/components/Editor.js
-import React, { useEffect, useState } from 'react';
-import useStyleStore from '../store/styleStore';
-
-const Editor = ({ selectedElement }) => {
-  const { modifiedElements, addModification } = useStyleStore();
-  const [elementPath, setElementPath] = useState('');
-
-  useEffect(() => {
-    if (selectedElement) {
-      const path = getXPath(selectedElement);
-      setElementPath(path);
-    }
-  }, [selectedElement]);
-
-  const getXPath = (element) => {
-    // xPath 계산 로직
-  };
-
-  const handleStyleChange = (area, property) => {
-    addModification(elementPath, area, property);
-  };
-
-  return (
-    <div>
-      {/* UI 요소들 */}
-      <FontArea onChange={handleStyleChange} />
-    </div>
-  );
-};
-
-export default Editor;
-```
-
-또한, `FontArea` 컴포넌트에서는 각 속성이 변경될 때마다 상태를 업데이트하고, 이를 통해 수정 내역을 관리했습니다. 상태 업데이트는 `addModification` 함수를 통해 이루어졌습니다. 또한, 수정된 속성의 제목(`EditorTitle`)에 `is-active` 클래스를 추가하여 스타일을 강조했습니다.
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><img width="300" src="https://github.com/user-attachments/assets/839bb4b0-6763-4ee2-9bfb-0b495f5e8742" alt="요소 수정 전"></td>
+      <td align="center"><img width="300" src="https://github.com/user-attachments/assets/c1522207-e0c5-49df-8ed6-1d31ca82216c" alt="요소 수정 후"></td>
+    </tr>
+    <tr>
+      <td align="center">요소 수정 전</td>
+      <td align="center">요소 수정 후</td>
+    </tr>
+  </table>
+</div>
 
 <br>
 
-## 💬 프로젝트 회고
+이 기능을 추가한 후, 제가 직접 사용해보니 작업 흐름이 훨씬 더 명확해졌습니다. 어떤 부분을 수정했는지 바로 알 수 있어서 작업 속도도 빨라졌고, 실수로 같은 부분을 여러 번 수정하는 일도 줄었습니다. 이런 경험을 통해 사용자의 관점에서 생각하고 기능을 개선하는 것의 중요성을 깨달았습니다.
+
+<br>
+
+# Project Insights
+
+웹 개발 경험은 있었지만 Electron을 사용한 데스크톱 앱 개발은 새로운 도전이었습니다. IPC 통신 구현 과정에서 웹과 데스크톱 앱 개발의 차이를 실감했고, 이를 극복하며 새로운 기술을 습득하는 즐거움을 느꼈습니다.
+
+이 프로젝트를 통해 사용자 중심 설계의 중요성을 깊이 깨달았습니다. 초기에는 기능 구현에만 집중했지만, 개발 과정에서 사용자 경험을 최우선으로 고려하는 방향으로 전환했습니다. 개인 프로젝트였기에 모든 결정을 혼자 내려야 했지만, 외부 피드백의 중요성 또한 크게 느꼈습니다. 주기적으로 다른 분들에게 사용성에 대한 의견을 구하고, 직접 사용자 입장에서 테스트하며 불편한 점들을 개선해 나갔습니다.
+
+이 과정에서 개발자의 시각과 사용자의 시각 사이의 간극을 좁힐 수 있었고, 결과적으로 더 나은 사용자 경험을 제공할 수 있었습니다. 예를 들어, 수정 내역 추적 기능은 직접 사용하면서 그 필요성을 깨닫고 추가한 것인데, 이는 프로젝트의 유용성을 높이는 결과를 가져왔습니다.
+
+이러한 경험을 통해 사용자 경험 향상이 프로젝트의 완성도와 가치를 결정짓는 핵심 요소임을 깨달았습니다. 또한, 프로젝트 완료 후에도 지속적인 개선과 학습의 필요성을 인식하게 되었습니다.
