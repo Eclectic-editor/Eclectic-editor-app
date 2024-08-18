@@ -1,8 +1,8 @@
 {
   "name": "eclectic-editor",
   "productName": "eclectic-editor",
-  "version": "0.2.0",
-  "description": "My Electron application description",
+  "version": "1.0.0",
+  "description": "사용자가 원하는 URL을 입력하면 해당 웹사이트의 CSS를 직관적으로 편집할 수 있는 도구입니다.",
   "main": ".vite/build/main.js",
   "repository": {
     "type": "git",
