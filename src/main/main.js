@@ -6,6 +6,7 @@ const {
   BrowserView,
   ipcMain,
   dialog,
+  screen,
 } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -189,6 +190,30 @@ const createBackgroundView = (x = 0) => {
   );
 };
 
+const updateResolutionViewBounds = () => {
+  const bounds = mainWindow.getBounds();
+
+  resolutionView.setBounds({
+    x: 0,
+    y: 0,
+    width: bounds.width,
+    height: 80,
+  });
+};
+
+const updateEditorViewBounds = () => {
+  if (editorView && mainWindow) {
+    const bounds = mainWindow.getBounds();
+
+    editorView.setBounds({
+      x: 0,
+      y: 80,
+      width: 400,
+      height: bounds.height - 80,
+    });
+  }
+};
+
 const createBrowserViews = async (url) => {
   if (editorView) {
     mainWindow.removeBrowserView(editorView);
@@ -229,6 +254,8 @@ const createBrowserViews = async (url) => {
   });
 
   mainWindow.addBrowserView(editorView);
+  updateEditorViewBounds();
+  updateResolutionViewBounds();
 
   editorView.setBounds({
     x: 0,
@@ -618,18 +645,25 @@ ipcMain.on('setResolution', async (event, resolutionKey) => {
 });
 
 const createWindow = () => {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+
   mainWindow = new BrowserWindow({
-    width: 1400,
-    height: 1000,
+    width,
+    height,
     webPreferences: {
       preload: preloadPath,
       contextIsolation: true,
       enableRemoteModule: false,
       sandbox: false,
     },
-    fullscreen: true,
+    resizable: true,
     backgroundColor: '#303030',
     icon: path.join(__dirname, '../../assets/icon.png'),
+  });
+
+  mainWindow.on('resize', () => {
+    updateResolutionViewBounds();
+    updateEditorViewBounds();
   });
 
   const startUrl =
